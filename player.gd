@@ -14,7 +14,13 @@ enum STATE { MOVE, CLIMB, HIT }
 @export var down_gravity: = 600
 @export var jump_amount: = 200
 @export var device_id: = 0
+@export var dash_amt: = 400
+@export var dash_time: = 0.16
 
+var can_dash: = true
+var is_dashing: = false
+var dash_dir: = Vector2.RIGHT
+var dash_timer: = 0.0
 var coyote_time: = 0.0
 
 @onready var anchor: Node2D = $Anchor
@@ -62,13 +68,22 @@ func _ready() -> void:
 	
 
 func _physics_process(delta: float) -> void:
+	var y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
+	var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
+	if abs(x_input) < 0.1:
+		x_input = 0
+	if abs(y_input) < 0.1:
+		y_input = 0
 	match state:
 		STATE.MOVE:
+			dash_timer -= delta
+			if dash_timer <= 0:
+				is_dashing = false
+			
 			coyote_time -= delta
 			
-			var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
-			if abs(x_input) < 0.5:
-				x_input = 0
+			if is_dashing == false and is_on_floor():
+				can_dash = true
 			
 			apply_gravity(delta)
 			
@@ -88,6 +103,9 @@ func _physics_process(delta: float) -> void:
 			
 			if not is_on_floor():
 				animation_player_lower.play("jump")
+				
+			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_Y) and can_dash:
+				dash(x_input, y_input)
 			
 			var was_on_floor: = is_on_floor()
 			move_and_slide()
@@ -101,27 +119,22 @@ func _physics_process(delta: float) -> void:
 		STATE.CLIMB:
 			var wall_normal = get_wall_normal()
 			
-			var y_axis = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
-			var x_axis = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
-			if abs(x_axis) < 0.5:
-				x_axis = 0
-			if abs(y_axis) < 0.5:
-				y_axis = 0
 			
-			velocity.y = y_axis * max_speed * 0.8
+			
+			velocity.y = y_input * max_speed * 0.8
 			
 			move_and_slide()
 			
-			if y_axis != 0:
+			if y_input != 0:
 				animation_player_lower.play("climb")
 			else:
 				animation_player_lower.play("hang")
 			
-			var request_detach: bool = (sign(x_axis) == wall_normal.x)
+			var request_detach: bool = (sign(x_input) == wall_normal.x)
 			
 			var request_wall_jump: bool = (
 				(request_detach or Input.is_joy_button_pressed(device_id, JOY_BUTTON_B))
-				and not y_axis > 0
+				and not y_input > 0
 			)
 			
 			if request_wall_jump:
@@ -131,7 +144,7 @@ func _physics_process(delta: float) -> void:
 				state = STATE.MOVE
 			
 			if not should_wall_climb() or request_detach:
-				if y_axis < 0: jump()
+				if y_input < 0: jump()
 				state = STATE.MOVE
 		
 		STATE.HIT:
@@ -142,12 +155,33 @@ func _physics_process(delta: float) -> void:
 func jump(amount: = jump_amount) -> void:
 	velocity.y = -amount
 
+func dash(x_input, y_input) -> void:
+	var input_dir: = Vector2(x_input, y_input).normalized()
+	
+	#if input_dir.x != 0:
+		#dash_dir.x = input_dir.x
+	#
+	#var final_dash_dir: = dash_dir
+	#if input_dir.y != 0 and input_dir.x == 0:
+		#final_dash_dir.x = 0
+	#final_dash_dir.y = input_dir.y
+	
+	can_dash = false
+	is_dashing = true
+	dash_timer = dash_time
+	
+	velocity = input_dir * dash_amt
+
 func accelerate_horizontally(horizontal_direction: float, delta: float) -> void:
+	if is_dashing:
+		return
 	var acceleration_amount: = acceleration
 	if not is_on_floor(): acceleration_amount = air_acceleration
 	velocity.x = move_toward(velocity.x, max_speed * horizontal_direction, acceleration_amount * delta * abs(horizontal_direction))
 
 func apply_friction(delta) -> void:
+	if is_dashing:
+		return
 	var friction_amount: = friction
 	if not is_on_floor(): friction_amount = air_friction
 	velocity.x = move_toward(velocity.x, 0.0, friction_amount * delta)
