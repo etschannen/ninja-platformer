@@ -13,6 +13,7 @@ enum STATE { MOVE, CLIMB, HIT }
 @export var up_gravity: = 500
 @export var down_gravity: = 600
 @export var jump_amount: = 200
+@export var device_id: = 0
 
 var coyote_time: = 0.0
 
@@ -27,11 +28,9 @@ var coyote_time: = 0.0
 @onready var hurtbox: Hurtbox = $Anchor/Hurtbox
 @onready var shaker_upper: = Shaker.new(sprite_upper)
 @onready var shaker_lower: = Shaker.new(sprite_lower)
-@onready var camera_2d: Camera2D = $Camera2D
 
 func _ready() -> void:
 	stats.no_health.connect(func():
-		camera_2d.reparent(get_tree().current_scene)
 		queue_free()
 	)
 	
@@ -67,14 +66,16 @@ func _physics_process(delta: float) -> void:
 		STATE.MOVE:
 			coyote_time -= delta
 			
-			var x_input = Input.get_axis("move_left", "move_right")
+			var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
+			if abs(x_input) < 0.5:
+				x_input = 0
 			
 			apply_gravity(delta)
 			
-			if Input.is_action_just_pressed("jump") and (is_on_floor() or coyote_time > 0):
+			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) and (is_on_floor() or coyote_time > 0):
 				jump()
 			
-			if Input.is_action_just_pressed("attack"):
+			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X):
 				animation_player_upper.play("attack")
 			
 			if x_input == 0:
@@ -100,8 +101,13 @@ func _physics_process(delta: float) -> void:
 		STATE.CLIMB:
 			var wall_normal = get_wall_normal()
 			
-			var y_axis = Input.get_axis("move_up", "move_down")
-			var x_axis = Input.get_axis("move_left", "move_right")
+			var y_axis = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
+			var x_axis = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
+			if abs(x_axis) < 0.5:
+				x_axis = 0
+			if abs(y_axis) < 0.5:
+				y_axis = 0
+			
 			velocity.y = y_axis * max_speed * 0.8
 			
 			move_and_slide()
@@ -114,8 +120,8 @@ func _physics_process(delta: float) -> void:
 			var request_detach: bool = (sign(x_axis) == wall_normal.x)
 			
 			var request_wall_jump: bool = (
-				(request_detach or Input.is_action_just_pressed("jump"))
-				and not Input.is_action_pressed("move_down")
+				(request_detach or Input.is_joy_button_pressed(device_id, JOY_BUTTON_B))
+				and not y_axis > 0
 			)
 			
 			if request_wall_jump:
@@ -125,7 +131,7 @@ func _physics_process(delta: float) -> void:
 				state = STATE.MOVE
 			
 			if not should_wall_climb() or request_detach:
-				if Input.is_action_pressed("move_up"): jump()
+				if y_axis < 0: jump()
 				state = STATE.MOVE
 		
 		STATE.HIT:
