@@ -340,7 +340,7 @@ tracks/3/keys = {
 
 [sub_resource type="Animation" id="Animation_u1c27"]
 resource_name = "hitflash"
-length = 0.5
+length = 0.3
 step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -349,7 +349,7 @@ tracks/0/path = NodePath("Anchor/SpriteUpper:material:shader_parameter/flash_ena
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.3),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
@@ -361,7 +361,7 @@ tracks/1/path = NodePath("Anchor/SpriteLower:material:shader_parameter/flash_ena
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.3),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
@@ -373,7 +373,7 @@ tracks/2/path = NodePath("Anchor/Hurtbox:is_invincible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.5),
+"times": PackedFloat32Array(0, 0.3),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
@@ -385,7 +385,7 @@ tracks/3/path = NodePath(".:state")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0.2),
+"times": PackedFloat32Array(0.3),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [0]
@@ -399,7 +399,7 @@ _data = {
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 50
-collision_layer = 2
+collision_layer = 3
 script = ExtResource("1_i3pqv")
 stats = SubResource("Resource_dw050")
 state = 0

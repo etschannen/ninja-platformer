@@ -9,19 +9,25 @@ enum STATE { MOVE, CLIMB, HIT }
 @export var acceleration: = 10000
 @export var air_acceleration: = 2000
 @export var friction: = 10000
-@export var air_friction: = 500
-@export var up_gravity: = 500
-@export var down_gravity: = 600
-@export var jump_amount: = 200
+@export var air_friction: = 10000
+@export var up_gravity: = 1000
+@export var down_gravity: = 1200
+@export var jump_amount: = 250
 @export var device_id: = 0
-@export var dash_amt: = 400
-@export var dash_time: = 0.16
+@export var dash_amt_start: = 300
+@export var dash_amt_finish: = 200
+@export var dash_time: = 0.10
+@export var dash_stop_time: = 0.04
+
+@export var dash_cooldown: = 0.5
 
 var can_dash: = true
 var is_dashing: = false
-var dash_dir: = Vector2.RIGHT
 var dash_timer: = 0.0
+var dash_cooldown_timer: = 0.0
 var coyote_time: = 0.0
+var dash_velocity = Vector2(0,0)
+var velocity_before_dash = Vector2(0,0)
 
 @onready var anchor: Node2D = $Anchor
 @onready var sprite_upper: Sprite2D = $Anchor/SpriteUpper
@@ -56,7 +62,7 @@ func _ready() -> void:
 	hurtbox.hurt.connect(func(other_hitbox: Hitbox):
 		var x_direction = sign(other_hitbox.global_position.direction_to(global_position).x)
 		if x_direction == 0: x_direction = -1
-		velocity.x = x_direction * max_speed
+		velocity.x = x_direction * dash_amt_finish
 		jump(jump_amount/2)
 		state = STATE.HIT
 		shaker_upper.shake(3, 0.3)
@@ -65,24 +71,41 @@ func _ready() -> void:
 		effects_animation_player.play("hitflash")
 		stats.health -= other_hitbox.damage
 	)
-	
+
+func update_dash_velocity():
+	if dash_timer < dash_stop_time:
+		velocity = Vector2(0,0)
+	else:
+		var dash_move_time = dash_timer-dash_stop_time
+		velocity = dash_velocity*(dash_amt_start*dash_move_time/dash_time+dash_amt_finish*(dash_time-dash_move_time)/dash_time)
+
+#func _input(event):
+	#if event is InputEventJoypadMotion && abs(event.axis_value) > 0.2:
+		#print("Axis: ", event.axis, "Value: ", event.axis_value, "Device: ", event.device)
+	#if event is InputEventJoypadButton:
+		#print("Button: ", event.button_index, "Pressed: ", event.pressed, "Device: ", event.device)
 
 func _physics_process(delta: float) -> void:
 	var y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
 	var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
-	if abs(x_input) < 0.1:
+	if abs(x_input) < 0.2:
 		x_input = 0
-	if abs(y_input) < 0.1:
+	if abs(y_input) < 0.2:
 		y_input = 0
 	match state:
 		STATE.MOVE:
 			dash_timer -= delta
-			if dash_timer <= 0:
-				is_dashing = false
-			
+			dash_cooldown_timer -= delta
 			coyote_time -= delta
 			
-			if is_dashing == false and is_on_floor():
+			if is_dashing:
+				if dash_timer <= 0:
+					is_dashing = false
+					velocity = velocity_before_dash
+				else:
+					update_dash_velocity()
+			
+			if !can_dash && dash_cooldown_timer <= 0 && is_on_floor():
 				can_dash = true
 			
 			apply_gravity(delta)
@@ -103,8 +126,8 @@ func _physics_process(delta: float) -> void:
 			
 			if not is_on_floor():
 				animation_player_lower.play("jump")
-				
-			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_Y) and can_dash:
+			
+			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) and can_dash:
 				dash(x_input, y_input)
 			
 			var was_on_floor: = is_on_floor()
@@ -118,8 +141,6 @@ func _physics_process(delta: float) -> void:
 			
 		STATE.CLIMB:
 			var wall_normal = get_wall_normal()
-			
-			
 			
 			velocity.y = y_input * max_speed * 0.8
 			
@@ -149,32 +170,31 @@ func _physics_process(delta: float) -> void:
 		
 		STATE.HIT:
 			move_and_slide()
-			apply_friction(delta)
-			apply_gravity(delta)
+			#apply_friction(delta)
+			#apply_gravity(delta)
 
 func jump(amount: = jump_amount) -> void:
 	velocity.y = -amount
 
 func dash(x_input, y_input) -> void:
 	var input_dir: = Vector2(x_input, y_input).normalized()
-	
-	#if input_dir.x != 0:
-		#dash_dir.x = input_dir.x
-	#
-	#var final_dash_dir: = dash_dir
-	#if input_dir.y != 0 and input_dir.x == 0:
-		#final_dash_dir.x = 0
-	#final_dash_dir.y = input_dir.y
+	if input_dir.x == 0 && input_dir.y == 0:
+		input_dir.x = anchor.scale.x
 	
 	can_dash = false
 	is_dashing = true
-	dash_timer = dash_time
+	dash_timer = dash_time+dash_stop_time
+	dash_cooldown_timer = dash_cooldown
 	
-	velocity = input_dir * dash_amt
+	velocity_before_dash = velocity
+	velocity_before_dash.y = 0
+	dash_velocity = input_dir
+	update_dash_velocity()
 
 func accelerate_horizontally(horizontal_direction: float, delta: float) -> void:
 	if is_dashing:
 		return
+		
 	var acceleration_amount: = acceleration
 	if not is_on_floor(): acceleration_amount = air_acceleration
 	velocity.x = move_toward(velocity.x, max_speed * horizontal_direction, acceleration_amount * delta * abs(horizontal_direction))
@@ -187,6 +207,8 @@ func apply_friction(delta) -> void:
 	velocity.x = move_toward(velocity.x, 0.0, friction_amount * delta)
 
 func apply_gravity(delta) -> void:
+	if is_dashing:
+		return
 	if not is_on_floor():
 		if velocity.y <= 0:
 			velocity.y += up_gravity * delta
