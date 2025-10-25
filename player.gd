@@ -5,17 +5,17 @@ enum STATE { MOVE, CLIMB, HIT }
 @export var stats: Stats
 @export var state: = STATE.CLIMB
 
-@export var max_speed: = 120
+@export var max_speed: = 180
 @export var acceleration: = 10000
 @export var air_acceleration: = 2000
 @export var friction: = 10000
 @export var air_friction: = 10000
 @export var up_gravity: = 1000
 @export var down_gravity: = 1200
-@export var jump_amount: = 250
+@export var jump_amount: = 300
 @export var device_id: = 0
-@export var dash_amt_start: = 300
-@export var dash_amt_finish: = 200
+@export var dash_amt_start: = 400
+@export var dash_amt_finish: = 300
 @export var dash_time: = 0.10
 @export var dash_stop_time: = 0.04
 
@@ -40,6 +40,7 @@ var velocity_before_dash = Vector2(0,0)
 @onready var hurtbox: Hurtbox = $Anchor/Hurtbox
 @onready var shaker_upper: = Shaker.new(sprite_upper)
 @onready var shaker_lower: = Shaker.new(sprite_lower)
+@onready var screen_size: = get_viewport_rect().size
 
 func _ready() -> void:
 	stats.no_health.connect(func():
@@ -63,12 +64,14 @@ func _ready() -> void:
 		var x_direction = sign(other_hitbox.global_position.direction_to(global_position).x)
 		if x_direction == 0: x_direction = -1
 		velocity.x = x_direction * dash_amt_finish
+		@warning_ignore("integer_division")
 		jump(jump_amount/2)
 		state = STATE.HIT
 		shaker_upper.shake(3, 0.3)
 		shaker_lower.shake(3, 0.3)
 		animation_player_lower.play("jump")
 		effects_animation_player.play("hitflash")
+		@warning_ignore("narrowing_conversion")
 		stats.health -= other_hitbox.damage
 	)
 
@@ -138,7 +141,7 @@ func _physics_process(delta: float) -> void:
 			if should_wall_climb():
 				animation_player_upper.play("hang")
 				state = STATE.CLIMB
-			
+					
 		STATE.CLIMB:
 			var wall_normal = get_wall_normal()
 			
