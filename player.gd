@@ -12,22 +12,23 @@ enum STATE { MOVE, CLIMB, HIT }
 @export var air_friction: = 10000
 @export var up_gravity: = 1000
 @export var down_gravity: = 1200
+@export var max_gravity: = 400
 @export var jump_amount: = 300
+@export var air_adjust_amount: = 75
 @export var device_id: = 0
-@export var dash_amt_start: = 400
-@export var dash_amt_finish: = 300
+@export var dash_amt_start: = 500
+@export var dash_amt_finish: = 180
 @export var dash_time: = 0.10
 @export var dash_stop_time: = 0.04
-
 @export var dash_cooldown: = 0.5
 
-var can_dash: = true
 var is_dashing: = false
 var dash_timer: = 0.0
 var dash_cooldown_timer: = 0.0
 var coyote_time: = 0.0
 var dash_velocity = Vector2(0,0)
 var velocity_before_dash = Vector2(0,0)
+var air_adjust = 0
 
 @onready var anchor: Node2D = $Anchor
 @onready var sprite_upper: Sprite2D = $Anchor/SpriteUpper
@@ -85,10 +86,10 @@ func update_dash_velocity():
 		velocity = dash_velocity*(dash_amt_start*dash_move_time/dash_time+dash_amt_finish*(dash_time-dash_move_time)/dash_time)
 
 #func _input(event):
-	#if event is InputEventJoypadMotion && abs(event.axis_value) > 0.2:
-		#print("Axis: ", event.axis, "Value: ", event.axis_value, "Device: ", event.device)
-	#if event is InputEventJoypadButton:
-		#print("Button: ", event.button_index, "Pressed: ", event.pressed, "Device: ", event.device)
+#	if event is InputEventJoypadMotion && abs(event.axis_value) > 0.2:
+#		print("Axis: ", event.axis, "Value: ", event.axis_value, "Device: ", event.device)
+#	if event is InputEventJoypadButton:
+#		print("Button: ", event.button_index, "Pressed: ", event.pressed, "Device: ", event.device)
 
 func _physics_process(delta: float) -> void:
 	var y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
@@ -110,9 +111,6 @@ func _physics_process(delta: float) -> void:
 				else:
 					update_dash_velocity()
 			
-			if !can_dash && dash_cooldown_timer <= 0 && is_on_floor():
-				can_dash = true
-			
 			apply_gravity(delta)
 			
 			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) and (is_on_floor() or coyote_time > 0):
@@ -132,11 +130,17 @@ func _physics_process(delta: float) -> void:
 			if not is_on_floor():
 				animation_player_lower.play("jump")
 			
-			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) and can_dash:
+			if (Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) || Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) >= 0.5) and dash_cooldown_timer <= 0:
 				dash(x_input, y_input)
 			
 			var was_on_floor: = is_on_floor()
+			if !is_on_floor():
+				velocity.y -= air_adjust
+				air_adjust = y_input*air_adjust_amount
+				velocity.y += air_adjust
 			move_and_slide()
+			if is_on_floor():
+				air_adjust = 0
 			if was_on_floor and not is_on_floor() and velocity.y >= 0:
 				coyote_time = 0.1
 			
@@ -186,7 +190,6 @@ func dash(x_input, y_input) -> void:
 	if input_dir.x == 0 && input_dir.y == 0:
 		input_dir.x = anchor.scale.x
 	
-	can_dash = false
 	is_dashing = true
 	dash_timer = dash_time+dash_stop_time
 	dash_cooldown_timer = dash_cooldown
@@ -199,7 +202,6 @@ func dash(x_input, y_input) -> void:
 func accelerate_horizontally(horizontal_direction: float, delta: float) -> void:
 	if is_dashing:
 		return
-		
 	var acceleration_amount: = acceleration
 	if not is_on_floor(): acceleration_amount = air_acceleration
 	velocity.x = move_toward(velocity.x, max_speed * horizontal_direction, acceleration_amount * delta * abs(horizontal_direction))
@@ -219,6 +221,7 @@ func apply_gravity(delta) -> void:
 			velocity.y += up_gravity * delta
 		else:
 			velocity.y += down_gravity * delta
+		velocity.y = min(max_gravity, velocity.y)
 
 func should_wall_climb() -> bool:
 	return (
