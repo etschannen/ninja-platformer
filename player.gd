@@ -74,6 +74,8 @@ func _ready() -> void:
 		@warning_ignore("narrowing_conversion")
 		stats.health -= other_hitbox.damage
 	)
+	
+	effects_animation_player.play("RESET")
 
 func update_dash_velocity():
 	if dash_timer < dash_stop_time:
@@ -141,7 +143,7 @@ func _physics_process(delta: float) -> void:
 			if should_wall_climb():
 				animation_player_upper.play("hang")
 				state = STATE.CLIMB
-					
+			
 		STATE.CLIMB:
 			var wall_normal = get_wall_normal()
 			
