@@ -15,3 +15,7 @@ func _ready() -> void:
 	get_tree().current_scene.add_child(player2)
 	player2.global_position = player_2_spawn.global_position
 	player2.device_id = 1
+	
+func _unhandled_input(event):
+	if event is InputEventKey && event.keycode == KEY_ESCAPE:
+		get_tree().quit()

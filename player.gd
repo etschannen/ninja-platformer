@@ -29,6 +29,7 @@ var coyote_time: = 0.0
 var dash_velocity = Vector2(0,0)
 var velocity_before_dash = Vector2(0,0)
 var air_adjust = 0
+var screen_size = Rect2(0,0,1,1)
 
 @onready var anchor: Node2D = $Anchor
 @onready var sprite_upper: Sprite2D = $Anchor/SpriteUpper
@@ -41,9 +42,13 @@ var air_adjust = 0
 @onready var hurtbox: Hurtbox = $Anchor/Hurtbox
 @onready var shaker_upper: = Shaker.new(sprite_upper)
 @onready var shaker_lower: = Shaker.new(sprite_lower)
-@onready var screen_size: = get_viewport_rect().size
 
 func _ready() -> void:
+	var viewport_size = get_viewport_rect().size
+	var top_left = get_viewport().canvas_transform.affine_inverse()*Vector2(0,0)
+	var bottom_right = get_viewport().canvas_transform.affine_inverse()*viewport_size
+	screen_size = Rect2(top_left, bottom_right-top_left)
+	
 	stats.no_health.connect(func():
 		queue_free()
 	)
@@ -92,6 +97,7 @@ func update_dash_velocity():
 #		print("Button: ", event.button_index, "Pressed: ", event.pressed, "Device: ", event.device)
 
 func _physics_process(delta: float) -> void:
+	wrapping_screen()
 	var y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
 	var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
 	if abs(x_input) < 0.2:
@@ -181,6 +187,10 @@ func _physics_process(delta: float) -> void:
 			move_and_slide()
 			#apply_friction(delta)
 			#apply_gravity(delta)
+
+func wrapping_screen():
+	position.x = wrapf(position.x, screen_size.position.x, screen_size.position.x + screen_size.size.x)
+	position.y = wrapf(position.y, screen_size.position.y, screen_size.position.y + screen_size.size.y)
 
 func jump(amount: = jump_amount) -> void:
 	velocity.y = -amount
