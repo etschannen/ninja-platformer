@@ -134,6 +134,9 @@ func _physics_process(delta: float) -> void:
 					jump()
 					right_hurt.take_hit(hitbox)
 			
+			if !is_on_floor():
+				velocity.y -= air_adjust
+				
 			apply_gravity(delta)
 			
 			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) and (is_on_floor() or coyote_time > 0):
@@ -158,7 +161,6 @@ func _physics_process(delta: float) -> void:
 			
 			var was_on_floor: = is_on_floor()
 			if !is_on_floor():
-				velocity.y -= air_adjust
 				air_adjust = y_input*air_adjust_amount
 				velocity.y += air_adjust
 			move_and_slide()
