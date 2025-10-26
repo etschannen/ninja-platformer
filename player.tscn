@@ -411,7 +411,7 @@ material = ExtResource("2_2hs0m")
 position = Vector2(-2, -13)
 texture = ExtResource("2_hqtel")
 offset = Vector2(16, 0)
-hframes = 15
+hframes = 27
 
 [node name="SpriteLower" type="Sprite2D" parent="Anchor"]
 material = ExtResource("2_2hs0m")

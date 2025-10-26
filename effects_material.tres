@@ -7,3 +7,4 @@ resource_local_to_scene = true
 shader = ExtResource("1_2du0g")
 shader_parameter/flash_enabled = false
 shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/clothing_end_color = Color(1, 1, 1, 1)
