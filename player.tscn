@@ -399,7 +399,6 @@ _data = {
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 50
-collision_layer = 3
 script = ExtResource("1_i3pqv")
 stats = SubResource("Resource_dw050")
 state = 0
@@ -424,11 +423,13 @@ frame = 6
 
 [node name="RayCastUpper" type="RayCast2D" parent="Anchor"]
 position = Vector2(5, -14)
-target_position = Vector2(2, 0)
+target_position = Vector2(5, 0)
+collision_mask = 2
 
 [node name="RayCastLower" type="RayCast2D" parent="Anchor"]
 position = Vector2(5, -5)
-target_position = Vector2(2, 0)
+target_position = Vector2(5, 0)
+collision_mask = 2
 
 [node name="Hitbox" type="Area2D" parent="Anchor"]
 collision_layer = 0
@@ -447,6 +448,18 @@ metadata/_custom_type_script = "uid://qjrnpv4tbvkp"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Anchor/Hurtbox"]
 position = Vector2(0, -11)
 shape = SubResource("RectangleShape2D_2hs0m")
+
+[node name="StompRayLeft" type="RayCast2D" parent="Anchor"]
+position = Vector2(-3, 0)
+target_position = Vector2(0, 5)
+collision_mask = 8
+collide_with_areas = true
+
+[node name="StompRayRight" type="RayCast2D" parent="Anchor"]
+position = Vector2(3, 0)
+target_position = Vector2(0, 5)
+collision_mask = 8
+collide_with_areas = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -10)

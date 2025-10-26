@@ -40,8 +40,15 @@ var screen_size = Rect2(0,0,1,1)
 @onready var ray_cast_upper: RayCast2D = $Anchor/RayCastUpper
 @onready var ray_cast_lower: RayCast2D = $Anchor/RayCastLower
 @onready var hurtbox: Hurtbox = $Anchor/Hurtbox
+@onready var hitbox: Hitbox = $Anchor/Hitbox
 @onready var shaker_upper: = Shaker.new(sprite_upper)
 @onready var shaker_lower: = Shaker.new(sprite_lower)
+@onready var stomp_ray_left: RayCast2D = $Anchor/StompRayLeft
+@onready var stomp_ray_right: RayCast2D = $Anchor/StompRayRight
+
+func clothing_color(color):
+	sprite_upper.material.set_shader_parameter("clothing_end_color", color)
+	
 
 func _ready() -> void:
 	var viewport_size = get_viewport_rect().size
@@ -51,6 +58,7 @@ func _ready() -> void:
 	
 	stats.no_health.connect(func():
 		queue_free()
+		get_tree().current_scene.player_killed()
 	)
 	
 	sprite_lower.material.set_shader_parameter("flash_color", Color("ff4d4d"))
@@ -80,8 +88,6 @@ func _ready() -> void:
 		@warning_ignore("narrowing_conversion")
 		stats.health -= other_hitbox.damage
 	)
-	
-	effects_animation_player.play("RESET")
 
 func update_dash_velocity():
 	if dash_timer < dash_stop_time:
@@ -116,6 +122,17 @@ func _physics_process(delta: float) -> void:
 					velocity = velocity_before_dash
 				else:
 					update_dash_velocity()
+					
+			if stomp_ray_left.is_colliding():
+				var left_hurt = stomp_ray_left.get_collider()
+				if left_hurt is Hurtbox:
+					jump()
+					left_hurt.take_hit(hitbox)
+			elif stomp_ray_right.is_colliding():
+				var right_hurt = stomp_ray_right.get_collider()
+				if right_hurt is Hurtbox:
+					jump()
+					right_hurt.take_hit(hitbox)
 			
 			apply_gravity(delta)
 			
