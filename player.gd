@@ -30,6 +30,9 @@ var dash_velocity = Vector2(0,0)
 var velocity_before_dash = Vector2(0,0)
 var air_adjust = 0
 var screen_size = Rect2(0,0,1,1)
+var attack_hold_timer = 0.0
+var dash_hold_timer = 0.0
+var jump_hold_timer = 0.0
 
 @onready var anchor: Node2D = $Anchor
 @onready var sprite_upper: Sprite2D = $Anchor/SpriteUpper
@@ -64,12 +67,12 @@ func _ready() -> void:
 	sprite_lower.material.set_shader_parameter("flash_color", Color("ff4d4d"))
 	
 	animation_player_lower.current_animation_changed.connect(func(animation_name: String):
-		if animation_player_upper.current_animation == "attack": return
+		if animation_player_upper.current_animation.begins_with("attack"): return
 		animation_player_upper.play(animation_name)
 	)
 	
 	animation_player_upper.animation_finished.connect(func(animation_name: String):
-		if animation_name != "attack": return
+		if !animation_name.begins_with("attack"): return
 		animation_player_upper.play(animation_player_lower.current_animation)
 		animation_player_upper.seek(animation_player_lower.current_animation_position)
 	)
@@ -116,6 +119,15 @@ func _physics_process(delta: float) -> void:
 			dash_cooldown_timer -= delta
 			coyote_time -= delta
 			
+			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A):
+				jump_hold_timer += delta
+				
+			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X):
+				attack_hold_timer += delta
+				
+			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) || Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) >= 0.5:
+				dash_hold_timer += delta
+			
 			if is_dashing:
 				if dash_timer <= 0:
 					is_dashing = false
@@ -139,11 +151,28 @@ func _physics_process(delta: float) -> void:
 				
 			apply_gravity(delta)
 			
-			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) and (is_on_floor() or coyote_time > 0):
+			if (!Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) && jump_hold_timer > 0) and (is_on_floor() or coyote_time > 0):
+				jump_hold_timer = 0.0
 				jump()
 			
-			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X):
-				animation_player_upper.play("attack")
+			if !Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) && !Input.is_joy_button_pressed(device_id, JOY_BUTTON_X) && attack_hold_timer > 0:
+				attack_hold_timer = 0.0
+				var input_vec = Vector2(x_input, y_input)
+				if input_vec == Vector2.ZERO:
+					animation_player_upper.play("attack_right")
+				else:
+					var angle = fmod(input_vec.angle() + PI*2, PI*2)
+					var sector = int(round(angle / (PI/4.0))) % 8
+					if sector == 5 || sector == 7:
+						animation_player_upper.play("attack_up_right")
+					elif sector == 6:
+						animation_player_upper.play("attack_up")
+					elif !is_on_floor() && (sector == 1 || sector == 3):
+						animation_player_upper.play("attack_down_right")
+					elif !is_on_floor() && sector == 2:
+						animation_player_upper.play("attack_down")
+					else:
+						animation_player_upper.play("attack_right")
 			
 			if x_input == 0:
 				apply_friction(delta)
@@ -156,7 +185,8 @@ func _physics_process(delta: float) -> void:
 			if not is_on_floor():
 				animation_player_lower.play("jump")
 			
-			if (Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) || Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) >= 0.5) and dash_cooldown_timer <= 0:
+			if !Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) && Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) < 0.5 && dash_hold_timer > 0 and dash_cooldown_timer <= 0:
+				dash_hold_timer = 0.0
 				dash(x_input, y_input)
 			
 			var was_on_floor: = is_on_floor()
