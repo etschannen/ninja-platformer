@@ -14,7 +14,7 @@ enum STATE { MOVE, CLIMB, HIT }
 @export var down_gravity: = 1200
 @export var max_gravity: = 400
 @export var jump_amount: = 200
-@export var jump_charge: = 0.3
+@export var jump_charge: = 0.2
 @export var air_adjust_amount: = 75
 @export var device_id: = 0
 @export var dash_amt_start: = 500
@@ -22,8 +22,8 @@ enum STATE { MOVE, CLIMB, HIT }
 @export var dash_time: = 0.10
 @export var dash_stop_time: = 0.04
 @export var dash_cooldown: = 0.5
-@export var attack_rebound_time: = 0.2
-@export var attack_cooldown: = 0.75
+@export var attack_rebound_time: = 0.4
+@export var attack_cooldown: = 0.6
 
 var is_dashing: = false
 var dash_timer: = 0.0
@@ -35,7 +35,6 @@ var air_adjust = 0
 var screen_size = Rect2(0,0,1,1)
 var attack_hold_timer = 0.0
 var attack_cooldown_timer = 0.0
-var dash_hold_timer = 0.0
 var jump_hold_timer = 0.0
 
 @onready var anchor: Node2D = $Anchor
@@ -81,15 +80,17 @@ func _ready() -> void:
 		animation_player_upper.seek(animation_player_lower.current_animation_position)
 	)
 	
-	hurtbox.hurt.connect(func(other_hitbox: Hitbox):
+	hurtbox.hurt.connect(func(other_hitbox: Hitbox, stomp):
+		if !stomp && attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time:
+			return
+		
 		var x_direction = sign(other_hitbox.global_position.direction_to(global_position).x)
 		if x_direction == 0: x_direction = -1
 			 
 		velocity.x = x_direction * dash_amt_finish
 		@warning_ignore("integer_division")
 		jump(jump_amount/2)
-		if attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time:
-			return
+		
 		state = STATE.HIT
 		shaker_upper.shake(3, 0.3)
 		shaker_lower.shake(3, 0.3)
@@ -130,8 +131,10 @@ func _physics_process(delta: float) -> void:
 			if attack_cooldown_timer < 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X)):
 				attack_hold_timer += delta
 				
-			if dash_cooldown_timer <= 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) || Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) >= 0.5):
-				dash_hold_timer += delta
+			if attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time:
+				sprite_lower.material.set_shader_parameter("block_enabled", true)
+			else:
+				sprite_lower.material.set_shader_parameter("block_enabled", false)
 			
 			if is_dashing:
 				if dash_timer <= 0:
@@ -144,12 +147,12 @@ func _physics_process(delta: float) -> void:
 				var left_hurt = stomp_ray_left.get_collider()
 				if left_hurt is Hurtbox:
 					jump()
-					left_hurt.take_hit(hitbox)
+					left_hurt.take_hit(hitbox, true)
 			elif stomp_ray_right.is_colliding():
 				var right_hurt = stomp_ray_right.get_collider()
 				if right_hurt is Hurtbox:
 					jump()
-					right_hurt.take_hit(hitbox)
+					right_hurt.take_hit(hitbox, true)
 			
 			if !is_on_floor():
 				velocity.y -= air_adjust
@@ -176,9 +179,9 @@ func _physics_process(delta: float) -> void:
 						animation_player_upper.play("attack_up_right")
 					elif sector == 6:
 						animation_player_upper.play("attack_up")
-					elif !is_on_floor() && (sector == 1 || sector == 3):
+					elif (sector == 1 || sector == 3):
 						animation_player_upper.play("attack_down_right")
-					elif !is_on_floor() && sector == 2:
+					elif sector == 2:
 						animation_player_upper.play("attack_down")
 					else:
 						animation_player_upper.play("attack_right")
@@ -194,8 +197,7 @@ func _physics_process(delta: float) -> void:
 			if not is_on_floor():
 				animation_player_lower.play("jump")
 			
-			if !Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) && Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) < 0.5 && dash_hold_timer > 0:
-				dash_hold_timer = 0.0
+			if dash_cooldown_timer <= 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) || Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) >= 0.5):
 				dash(x_input, y_input)
 			
 			var was_on_floor: = is_on_floor()

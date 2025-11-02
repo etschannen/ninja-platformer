@@ -8,8 +8,8 @@ class_name Hurtbox extends Area2D
 			if child is not CollisionShape2D and child is not CollisionPolygon2D: continue
 			child.set_deferred("disabled", is_invincible)
 
-signal hurt(other_hitbox: Hitbox)
+signal hurt(other_hitbox: Hitbox, stomp)
 
-func take_hit(other_hitbox: Hitbox) -> void:
+func take_hit(other_hitbox: Hitbox, stomp: bool) -> void:
 	if is_invincible: return
-	hurt.emit(other_hitbox)
+	hurt.emit(other_hitbox, stomp)
