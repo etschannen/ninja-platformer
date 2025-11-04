@@ -1,0 +1,50 @@
+[gd_scene load_steps=6 format=3 uid="uid://boeuxg3wo21ss"]
+
+[ext_resource type="Script" uid="uid://2vgbp7xd1so3" path="res://Menus/menu.gd" id="1_tc4cd"]
+
+[sub_resource type="SystemFont" id="SystemFont_sy07a"]
+font_names = PackedStringArray("Avenir")
+oversampling = 8.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_tc4cd"]
+font = SubResource("SystemFont_sy07a")
+font_size = 22
+
+[sub_resource type="SystemFont" id="SystemFont_asx6s"]
+font_names = PackedStringArray("Avenir")
+oversampling = 8.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_f371u"]
+font = SubResource("SystemFont_asx6s")
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tc4cd")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Ferox"
+label_settings = SubResource("LabelSettings_tc4cd")
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Press space to start"
+label_settings = SubResource("LabelSettings_f371u")
+horizontal_alignment = 1
