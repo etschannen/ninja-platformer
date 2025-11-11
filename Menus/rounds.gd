@@ -5,12 +5,15 @@ extends Control
 
 @export var roundData = preload("res://global_stats.tres")
 
+var run_timer = 0.0
+
 func _ready() -> void:
 	blue_score.text = "Blue: " + str(roundData.blue_score)
 	red_score.text = "Red: " + str(roundData.red_score)
 	
 func _process(delta: float) -> void:
-	if Input.is_joy_button_pressed(0, JOY_BUTTON_X) || Input.is_joy_button_pressed(1, JOY_BUTTON_X):
+	run_timer += delta
+	if run_timer > 2.0 && (Input.is_joy_button_pressed(0, JOY_BUTTON_X) || Input.is_joy_button_pressed(1, JOY_BUTTON_X)):
 		if roundData.blue_score >= 5 || roundData.red_score >= 5:
 			roundData.blue_score = 0
 			roundData.red_score = 0

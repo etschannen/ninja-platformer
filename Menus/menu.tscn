@@ -34,6 +34,6 @@ texture = ExtResource("2_asx6s")
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_f371u")
-text = "Press y to start"
+text = "Press x to start"
 label_settings = SubResource("LabelSettings_f371u")
 horizontal_alignment = 1
