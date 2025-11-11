@@ -51,7 +51,7 @@ tile_map_data = PackedByteArray("AADs//T/BAABAAEAAADs//X/BAABAAEAAADs//b/BAABAAE
 tile_set = SubResource("TileSet_dwbse")
 metadata/_edit_lock_ = true
 
-[node name="Level1" type="Node" parent="."]
+[node name="Level1" type="Node2D" parent="."]
 
 [node name="Center" type="Marker2D" parent="Level1"]
 
@@ -61,7 +61,7 @@ position = Vector2(-180, 15)
 [node name="Player2Spawn" type="Marker2D" parent="Level1"]
 position = Vector2(180, 15)
 
-[node name="Level2" type="Node" parent="."]
+[node name="Level2" type="Node2D" parent="."]
 
 [node name="Center" type="Marker2D" parent="Level2"]
 position = Vector2(800, 0)
