@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://c3e7k0kpl3f5d"]
+[gd_scene load_steps=2 format=3 uid="uid://c3e7k0kpl3f5d"]
+
+[ext_resource type="Script" uid="uid://1w85fuitkfy5" path="res://Menus/rounds.gd" id="1_7patq"]
 
 [node name="Rounds" type="Control"]
 layout_mode = 3
@@ -7,3 +9,4 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_7patq")

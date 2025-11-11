@@ -33,4 +33,4 @@ func _unhandled_input(event):
 		
 func player_killed():
 	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	get_tree().change_scene_to_file("res://Menus/rounds.tscn")

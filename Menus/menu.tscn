@@ -2,13 +2,10 @@
 
 [ext_resource type="Script" uid="uid://2vgbp7xd1so3" path="res://Menus/menu.gd" id="1_tc4cd"]
 [ext_resource type="Texture2D" uid="uid://csiqkfsx1ml11" path="res://Ferox logo.png" id="2_asx6s"]
-
-[sub_resource type="SystemFont" id="SystemFont_asx6s"]
-font_names = PackedStringArray("VCR OSD Mono")
-oversampling = 10.0
+[ext_resource type="FontFile" uid="uid://dl1hq8cjid3e7" path="res://VCR_OSD_MONO_1.001.ttf" id="3_f371u"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_f371u"]
-font = SubResource("SystemFont_asx6s")
+font = ExtResource("3_f371u")
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -36,6 +33,7 @@ texture = ExtResource("2_asx6s")
 
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_f371u")
 text = "Press y to start"
 label_settings = SubResource("LabelSettings_f371u")
 horizontal_alignment = 1
