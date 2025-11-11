@@ -1,10 +1,16 @@
 extends Node2D
 
 const PLAYER_SCENE = preload("res://player.tscn")
-@onready var player_1_spawn: Marker2D = $Level1_Player1Spawn
-@onready var player_2_spawn: Marker2D = $Level1_Player2Spawn
-
+@onready var level1: = $Level1
+@onready var level2: = $Level2
+@onready var camera: = $Camera
 func _ready() -> void:
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var levelNumber = rng.randi_range(1,2)
+	var levelText = "Level"+str(levelNumber)
+	camera.offset = get_node(levelText+"/Center").global_position
+	
 	var player1_guid = Input.get_joy_guid(0)
 	var player2_guid = Input.get_joy_guid(1)
 	
@@ -20,12 +26,12 @@ func _ready() -> void:
 		player2.device_id = 0
 	
 	get_tree().current_scene.add_child(player1)
-	player1.global_position = player_1_spawn.global_position
+	player1.global_position =  get_node(levelText+"/Player1Spawn").global_position
 	player1.clothing_color(Color8(8,135,206,255))
 	player1.player_id = 0
 	
 	get_tree().current_scene.add_child(player2)
-	player2.global_position = player_2_spawn.global_position
+	player2.global_position = get_node(levelText+"/Player2Spawn").global_position
 	player2.clothing_color(Color8(194,11,11,255))
 	player1.player_id = 1
 	
