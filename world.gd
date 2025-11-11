@@ -1,8 +1,8 @@
 extends Node2D
 
 const PLAYER_SCENE = preload("res://player.tscn")
-@onready var player_1_spawn: Marker2D = $Player1Spawn
-@onready var player_2_spawn: Marker2D = $Player2Spawn
+@onready var player_1_spawn: Marker2D = $Level1_Player1Spawn
+@onready var player_2_spawn: Marker2D = $Level1_Player2Spawn
 
 func _ready() -> void:
 	var player1_guid = Input.get_joy_guid(0)

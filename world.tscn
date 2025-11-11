@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=4 uid="uid://b6jqdqmnr2cqf"]
 
 [ext_resource type="Script" uid="uid://dephygc4nk1vv" path="res://world.gd" id="1_aqk2v"]
-[ext_resource type="Texture2D" uid="uid://bploa6n62ftii" path="res://Sprite-0002.png" id="2_fj7yv"]
+[ext_resource type="Texture2D" uid="uid://ty14557mmoqp" path="res://Sprite-0002.png" id="2_fj7yv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tlwt5"]
 texture = ExtResource("2_fj7yv")
@@ -42,8 +42,10 @@ metadata/_edit_lock_ = true
 [node name="Camera2D2" type="Camera2D" parent="."]
 zoom = Vector2(0.5, 0.5)
 
-[node name="Player1Spawn" type="Marker2D" parent="."]
+[node name="Level1_Center" type="Marker2D" parent="."]
+
+[node name="Level1_Player1Spawn" type="Marker2D" parent="."]
 position = Vector2(-180, 15)
 
-[node name="Player2Spawn" type="Marker2D" parent="."]
+[node name="Level1_Player2Spawn" type="Marker2D" parent="."]
 position = Vector2(180, 15)

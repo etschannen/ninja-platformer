@@ -4,6 +4,8 @@ extends Control
 @onready var red_score: Label = $CenterContainer/VBoxContainer/RedScore
 
 @export var roundData = preload("res://global_stats.tres")
+@export var run_delay = 1.5
+
 
 var run_timer = 0.0
 
@@ -13,7 +15,7 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	run_timer += delta
-	if run_timer > 2.0 && (Input.is_joy_button_pressed(0, JOY_BUTTON_X) || Input.is_joy_button_pressed(1, JOY_BUTTON_X)):
+	if run_timer > run_delay && (Input.is_joy_button_pressed(0, JOY_BUTTON_X) || Input.is_joy_button_pressed(1, JOY_BUTTON_X)):
 		if roundData.blue_score >= 5 || roundData.red_score >= 5:
 			roundData.blue_score = 0
 			roundData.red_score = 0
