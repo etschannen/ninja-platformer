@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://ot6ak1pgga4m" path="res://enemy_cannon.gd" id="1_0g0tg"]
 [ext_resource type="Texture2D" uid="uid://br8ixo1amaprg" path="res://cannon_enemy.png" id="1_ur6l4"]
 [ext_resource type="Script" uid="uid://qjrnpv4tbvkp" path="res://hurtbox.gd" id="2_0g0tg"]
-[ext_resource type="Script" uid="uid://2i8vukneqwu1" path="res://stats.gd" id="2_ssugy"]
+[ext_resource type="Script" uid="uid://2i8vukneqwu1" path="res://player_stats.gd" id="2_ssugy"]
 [ext_resource type="Script" uid="uid://cqxr3go31xf5c" path="res://hitbox.gd" id="3_4if56"]
 [ext_resource type="Material" uid="uid://dx10wnlxgh3sb" path="res://effects_material.tres" id="3_a4fqf"]
 

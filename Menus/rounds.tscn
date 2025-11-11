@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://c3e7k0kpl3f5d"]
+[gd_scene load_steps=4 format=3 uid="uid://c3e7k0kpl3f5d"]
 
 [ext_resource type="Script" uid="uid://1w85fuitkfy5" path="res://Menus/rounds.gd" id="1_7patq"]
+[ext_resource type="FontFile" uid="uid://dl1hq8cjid3e7" path="res://VCR_OSD_MONO_1.001.ttf" id="2_b3j43"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_k4q1x"]
+font = ExtResource("2_b3j43")
 
 [node name="Rounds" type="Control"]
 layout_mode = 3
@@ -10,3 +14,28 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7patq")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+
+[node name="BlueScore" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_b3j43")
+text = "Blue: 0"
+label_settings = SubResource("LabelSettings_k4q1x")
+horizontal_alignment = 1
+
+[node name="RedScore" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_b3j43")
+text = "Red: 0"
+label_settings = SubResource("LabelSettings_k4q1x")
+horizontal_alignment = 1

@@ -1,4 +1,4 @@
-class_name Stats extends Resource
+class_name PlayerStats extends Resource
 
 @export var health: = 10 :
 	set(value):

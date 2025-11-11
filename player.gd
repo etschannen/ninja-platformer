@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 enum STATE { MOVE, CLIMB, HIT }
 
-@export var stats: Stats
+@export var stats: PlayerStats
 @export var state: = STATE.CLIMB
 
 @export var max_speed: = 180
@@ -17,6 +17,7 @@ enum STATE { MOVE, CLIMB, HIT }
 @export var jump_charge: = 0.2
 @export var air_adjust_amount: = 75
 @export var device_id: = 0
+@export var player_id: = 0
 @export var dash_amt_start: = 500
 @export var dash_amt_finish: = 180
 @export var dash_time: = 0.10
@@ -52,6 +53,8 @@ var jump_hold_timer = 0.0
 @onready var stomp_ray_left: RayCast2D = $Anchor/StompRayLeft
 @onready var stomp_ray_right: RayCast2D = $Anchor/StompRayRight
 
+@export var roundData = preload("res://global_stats.tres")
+
 func clothing_color(color):
 	sprite_upper.material.set_shader_parameter("clothing_end_color", color)
 	
@@ -64,6 +67,10 @@ func _ready() -> void:
 	
 	stats.no_health.connect(func():
 		queue_free()
+		if player_id == 0:
+			roundData.blue_score += 1
+		else:
+			roundData.red_score += 1
 		get_tree().current_scene.player_killed()
 	)
 	

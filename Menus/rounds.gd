@@ -1,5 +1,14 @@
 extends Control
 
+@onready var blue_score: Label = $CenterContainer/VBoxContainer/BlueScore
+@onready var red_score: Label = $CenterContainer/VBoxContainer/RedScore
+
+@export var roundData = preload("res://global_stats.tres")
+
+func _ready() -> void:
+	blue_score.text = "Blue: " + str(roundData.blue_score)
+	red_score.text = "Red: " + str(roundData.red_score)
+	
 func _process(delta: float) -> void:
 	if Input.is_joy_button_pressed(0, JOY_BUTTON_X) || Input.is_joy_button_pressed(1, JOY_BUTTON_X):
 		get_tree().change_scene_to_file("res://world.tscn")

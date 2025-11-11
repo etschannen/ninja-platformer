@@ -15,6 +15,10 @@ run/main_scene="uid://boeuxg3wo21ss"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+RoundData="*res://global_stats.tres"
+
 [display]
 
 window/size/viewport_width=320

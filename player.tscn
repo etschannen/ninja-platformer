@@ -1,7 +1,7 @@
 [gd_scene load_steps=33 format=3 uid="uid://bl7cbq2ma5mjj"]
 
 [ext_resource type="Script" uid="uid://b4xqkm8dmmdgk" path="res://player.gd" id="1_i3pqv"]
-[ext_resource type="Script" uid="uid://2i8vukneqwu1" path="res://stats.gd" id="2_1jxqw"]
+[ext_resource type="Script" uid="uid://2i8vukneqwu1" path="res://player_stats.gd" id="2_1jxqw"]
 [ext_resource type="Material" uid="uid://dx10wnlxgh3sb" path="res://effects_material.tres" id="2_2hs0m"]
 [ext_resource type="Texture2D" uid="uid://ctx0v1ampqc8a" path="res://ninja_upper.png" id="2_hqtel"]
 [ext_resource type="Texture2D" uid="uid://bch8duwf6eai4" path="res://ninja_lower.png" id="3_sweqy"]
@@ -46,151 +46,6 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [PackedVector2Array()]
-}
-
-[sub_resource type="Animation" id="Animation_urp6f"]
-resource_name = "climb"
-length = 0.4
-loop_mode = 1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [12, 13, 14, 11]
-}
-
-[sub_resource type="Animation" id="Animation_ivps1"]
-resource_name = "hang"
-length = 0.1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [11]
-}
-
-[sub_resource type="Animation" id="Animation_b26j0"]
-resource_name = "jump"
-length = 0.1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [10]
-}
-
-[sub_resource type="Animation" id="Animation_2hs0m"]
-resource_name = "run"
-length = 0.6
-loop_mode = 1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [0, 1, 2, 3, 4, 5]
-}
-
-[sub_resource type="Animation" id="Animation_dw050"]
-resource_name = "stand"
-length = 0.1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [6]
-}
-
-[sub_resource type="Animation" id="Animation_q13i1"]
-resource_name = "attack_up"
-length = 0.3
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [18, 19, 20]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Anchor/Hitbox/CollisionPolygon2D:polygon")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.10162541, 0.2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [PackedVector2Array(-3, -25, 0, -35, 3, -40, 7, -40, 9, -37, 12, -30, 12, -41, 8, -52, 3, -52, -1, -46, -3, -38), PackedVector2Array(-3, -25, -3, -43, -5, -40, -5, -29), PackedVector2Array()]
-}
-
-[sub_resource type="Animation" id="Animation_pylmc"]
-resource_name = "attack_up_right"
-length = 0.3
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.099999994, 0.19999999),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [15, 16, 17]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Anchor/Hitbox/CollisionPolygon2D:polygon")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [PackedVector2Array(-2, -26, 3, -34, 12, -41, 20, -42, 25, -38, 25, -34, 20, -29, 20, -33, 14, -35, 6, -32), PackedVector2Array(-2, -26, 9, -36, 5, -35, 0, -30), PackedVector2Array()]
 }
 
 [sub_resource type="Animation" id="Animation_pbfsw"]
@@ -278,6 +133,151 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [PackedVector2Array(8, -10, 19, -10, 28, -13, 30, -15, 30, -19, 28, -21, 21, -24, 7, -26, 1, -24, 13, -22, 19, -19, 19, -16, 12, -12), PackedVector2Array(1, -25, 19, -25, 19, -26, 16, -27, 4, -27, 1, -26), PackedVector2Array()]
+}
+
+[sub_resource type="Animation" id="Animation_q13i1"]
+resource_name = "attack_up"
+length = 0.3
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [18, 19, 20]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Anchor/Hitbox/CollisionPolygon2D:polygon")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.10162541, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [PackedVector2Array(-3, -25, 0, -35, 3, -40, 7, -40, 9, -37, 12, -30, 12, -41, 8, -52, 3, -52, -1, -46, -3, -38), PackedVector2Array(-3, -25, -3, -43, -5, -40, -5, -29), PackedVector2Array()]
+}
+
+[sub_resource type="Animation" id="Animation_pylmc"]
+resource_name = "attack_up_right"
+length = 0.3
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.099999994, 0.19999999),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [15, 16, 17]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Anchor/Hitbox/CollisionPolygon2D:polygon")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [PackedVector2Array(-2, -26, 3, -34, 12, -41, 20, -42, 25, -38, 25, -34, 20, -29, 20, -33, 14, -35, 6, -32), PackedVector2Array(-2, -26, 9, -36, 5, -35, 0, -30), PackedVector2Array()]
+}
+
+[sub_resource type="Animation" id="Animation_urp6f"]
+resource_name = "climb"
+length = 0.4
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [12, 13, 14, 11]
+}
+
+[sub_resource type="Animation" id="Animation_ivps1"]
+resource_name = "hang"
+length = 0.1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [11]
+}
+
+[sub_resource type="Animation" id="Animation_b26j0"]
+resource_name = "jump"
+length = 0.1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [10]
+}
+
+[sub_resource type="Animation" id="Animation_2hs0m"]
+resource_name = "run"
+length = 0.6
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5]
+}
+
+[sub_resource type="Animation" id="Animation_dw050"]
+resource_name = "stand"
+length = 0.1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [6]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_b26j0"]
