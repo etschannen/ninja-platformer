@@ -8,7 +8,7 @@ func _ready() -> void:
 	var player1_guid = Input.get_joy_guid(0)
 	var player2_guid = Input.get_joy_guid(1)
 	
-	RenderingServer.set_default_clear_color(Color.BLACK)
+	RenderingServer.set_default_clear_color("#272736")
 	var player1 = PLAYER_SCENE.instantiate()
 	var player2 = PLAYER_SCENE.instantiate()
 	
