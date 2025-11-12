@@ -155,11 +155,13 @@ func _physics_process(delta: float) -> void:
 				if left_hurt is Hurtbox:
 					jump()
 					left_hurt.take_hit(hitbox, true)
+					hurtbox.take_hit(hitbox,true)
 			elif stomp_ray_right.is_colliding():
 				var right_hurt = stomp_ray_right.get_collider()
 				if right_hurt is Hurtbox:
 					jump()
 					right_hurt.take_hit(hitbox, true)
+					hurtbox.take_hit(hitbox,true)
 			
 			if !is_on_floor():
 				velocity.y -= air_adjust

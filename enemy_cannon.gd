@@ -4,10 +4,10 @@ const SPARK_PARTICLE_BURST_EFFECT = preload("res://sparks_particle_burst_effect.
 const IMPACT_PARTICLE_BURST_EFFECT = preload("res://impact_particle_burst_effect.tscn")
 const BULLET_SCENE = preload("res://bullet.tscn")
 
-@export var stats: Stats :
+@export var stats: PlayerStats :
 	set(value):
 		stats = value
-		if stats is not Stats: return
+		if stats is not PlayerStats: return
 		stats = stats.duplicate()
 
 @onready var sprite_2d: Sprite2D = $Sprite2D
