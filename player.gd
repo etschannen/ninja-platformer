@@ -52,6 +52,7 @@ var jump_hold_timer = 0.0
 @onready var shaker_lower: = Shaker.new(sprite_lower)
 @onready var stomp_ray_left: RayCast2D = $Anchor/StompRayLeft
 @onready var stomp_ray_right: RayCast2D = $Anchor/StompRayRight
+@onready var stomp_ray_middle: RayCast2D = $Anchor/StompRayMiddle
 
 @export var roundData = preload("res://global_stats.tres")
 
@@ -155,13 +156,16 @@ func _physics_process(delta: float) -> void:
 				if left_hurt is Hurtbox:
 					jump()
 					left_hurt.take_hit(hitbox, true)
-					hurtbox.take_hit(hitbox,true)
 			elif stomp_ray_right.is_colliding():
 				var right_hurt = stomp_ray_right.get_collider()
 				if right_hurt is Hurtbox:
 					jump()
 					right_hurt.take_hit(hitbox, true)
-					hurtbox.take_hit(hitbox,true)
+			elif stomp_ray_middle.is_colliding():
+				var middle_hurt = stomp_ray_middle.get_collider()
+				if middle_hurt is Hurtbox:
+					jump()
+					middle_hurt.take_hit(hitbox, true)
 			
 			if !is_on_floor():
 				velocity.y -= air_adjust

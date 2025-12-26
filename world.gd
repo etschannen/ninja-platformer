@@ -37,7 +37,7 @@ func _ready() -> void:
 	get_tree().current_scene.add_child(player2)
 	player2.global_position = get_node(levelText+"/Player2Spawn").global_position
 	player2.clothing_color(Color8(194,11,11,255))
-	player1.player_id = 1
+	player2.player_id = 1
 	
 func _unhandled_input(event):
 	if event is InputEventKey && event.keycode == KEY_ESCAPE:
