@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://bl7cbq2ma5mjj"]
+[gd_scene load_steps=37 format=3 uid="uid://bl7cbq2ma5mjj"]
 
 [ext_resource type="Script" uid="uid://b4xqkm8dmmdgk" path="res://player.gd" id="1_i3pqv"]
 [ext_resource type="Script" uid="uid://2i8vukneqwu1" path="res://player_stats.gd" id="2_1jxqw"]
@@ -7,6 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://bch8duwf6eai4" path="res://ninja_lower.png" id="3_sweqy"]
 [ext_resource type="Script" uid="uid://cqxr3go31xf5c" path="res://hitbox.gd" id="4_hqtel"]
 [ext_resource type="Script" uid="uid://qjrnpv4tbvkp" path="res://hurtbox.gd" id="5_sweqy"]
+[ext_resource type="AudioStream" uid="uid://bvkb63cwyd0ca" path="res://dash.wav" id="8_b26j0"]
+[ext_resource type="AudioStream" uid="uid://bnkeqe3gqh3x7" path="res://jump.wav" id="8_dw050"]
+[ext_resource type="AudioStream" uid="uid://b1psmyy57hppb" path="res://hitHurt.wav" id="8_n7ghd"]
+[ext_resource type="AudioStream" uid="uid://crq5olvkleox0" path="res://Slash.wav" id="11_nvl01"]
 
 [sub_resource type="Resource" id="Resource_dw050"]
 resource_local_to_scene = true
@@ -604,3 +608,15 @@ libraries = {
 libraries = {
 &"": SubResource("AnimationLibrary_op7ga")
 }
+
+[node name="HitHurtSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_n7ghd")
+
+[node name="DashSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_b26j0")
+
+[node name="JumpSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_dw050")
+
+[node name="SlashSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11_nvl01")

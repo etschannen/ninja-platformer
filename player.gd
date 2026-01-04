@@ -53,6 +53,10 @@ var jump_hold_timer = 0.0
 @onready var stomp_ray_left: RayCast2D = $Anchor/StompRayLeft
 @onready var stomp_ray_right: RayCast2D = $Anchor/StompRayRight
 @onready var stomp_ray_middle: RayCast2D = $Anchor/StompRayMiddle
+@onready var jump_sound: AudioStreamPlayer = $JumpSound
+@onready var dash_sound: AudioStreamPlayer = $DashSound
+@onready var hit_hurt_sound: AudioStreamPlayer = $HitHurtSound
+@onready var slash_sound: AudioStreamPlayer = $SlashSound
 
 @export var roundData = preload("res://global_stats.tres")
 
@@ -91,6 +95,7 @@ func _ready() -> void:
 	hurtbox.hurt.connect(func(other_hitbox: Hitbox, stomp):
 		if !stomp && attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time:
 			return
+		hit_hurt_sound.play()
 		
 		var x_direction = sign(other_hitbox.global_position.direction_to(global_position).x)
 		if x_direction == 0: x_direction = -1
@@ -173,6 +178,8 @@ func _physics_process(delta: float) -> void:
 			apply_gravity(delta)
 			
 			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) && (jump_hold_timer > 0 || (is_on_floor() or coyote_time > 0)):
+				if jump_hold_timer == 0:
+					jump_sound.play()
 				jump_hold_timer += delta
 				jump()
 				
@@ -180,6 +187,7 @@ func _physics_process(delta: float) -> void:
 				jump_hold_timer = 0
 			
 			if !Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) && !Input.is_joy_button_pressed(device_id, JOY_BUTTON_X) && attack_hold_timer > 0:
+				slash_sound.play()
 				attack_hold_timer = 0.0
 				attack_cooldown_timer = attack_cooldown
 				var input_vec = Vector2(x_input, y_input)
@@ -269,6 +277,7 @@ func jump(amount: = jump_amount) -> void:
 	velocity.y = -amount
 
 func dash(x_input, y_input) -> void:
+	dash_sound.play()
 	var input_dir: = Vector2(x_input, y_input).normalized()
 	if input_dir.x == 0 && input_dir.y == 0:
 		input_dir.x = anchor.scale.x
