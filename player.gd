@@ -58,6 +58,8 @@ var jump_hold_timer = 0.0
 @onready var dash_sound: AudioStreamPlayer = $DashSound
 @onready var hit_hurt_sound: AudioStreamPlayer = $HitHurtSound
 @onready var slash_sound: AudioStreamPlayer = $SlashSound
+@onready var particles: GPUParticles2D = $GPUParticles2D
+@onready var particles_material: ParticleProcessMaterial = $GPUParticles2D.process_material
 
 func clothing_color(color):
 	sprite_upper.material.set_shader_parameter("clothing_end_color", color)
@@ -157,6 +159,7 @@ func _physics_process(delta: float) -> void:
 			if is_dashing:
 				if dash_timer <= 0:
 					is_dashing = false
+					particles.emitting = false
 					velocity = velocity_before_dash
 				else:
 					update_dash_velocity()
@@ -244,6 +247,7 @@ func _physics_process(delta: float) -> void:
 			
 			if should_wall_climb():
 				is_dashing = false
+				particles.emitting = false
 				sprite_lower.material.set_shader_parameter("block_enabled", false)
 				animation_player_upper.play("hang")
 				state = STATE.CLIMB
@@ -317,6 +321,9 @@ func dash(x_input, y_input) -> void:
 		input_dir.x = anchor.scale.x
 	
 	is_dashing = true
+	particles.emitting = true
+	particles_material.direction.x = -1*input_dir.x
+	particles_material.direction.y = -1*input_dir.y
 	animation_player_upper.play("dash")
 	animation_player_lower.play("dash")
 	dash_timer = dash_time+dash_stop_time

@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3 uid="uid://bl7cbq2ma5mjj"]
+[gd_scene load_steps=43 format=3 uid="uid://bl7cbq2ma5mjj"]
 
 [ext_resource type="Script" uid="uid://b4xqkm8dmmdgk" path="res://player.gd" id="1_i3pqv"]
 [ext_resource type="Script" uid="uid://2i8vukneqwu1" path="res://player_stats.gd" id="2_1jxqw"]
@@ -573,6 +573,22 @@ _data = {
 &"hitflash": SubResource("Animation_u1c27")
 }
 
+[sub_resource type="Gradient" id="Gradient_nvl01"]
+offsets = PackedFloat32Array(0, 0.47131783)
+colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ivps1"]
+gradient = SubResource("Gradient_nvl01")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_urp6f"]
+particle_flag_disable_z = true
+direction = Vector3(0, -1, 0)
+spread = 20.0
+initial_velocity_min = 30.0
+initial_velocity_max = 40.0
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_ivps1")
+
 [node name="Player" type="CharacterBody2D"]
 z_index = 50
 collision_layer = 32
@@ -676,3 +692,8 @@ stream = ExtResource("8_dw050")
 
 [node name="SlashSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("11_nvl01")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 60
+process_material = SubResource("ParticleProcessMaterial_urp6f")
