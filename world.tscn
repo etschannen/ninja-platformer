@@ -185,6 +185,18 @@ position = Vector2(50, 25)
 [node name="Player4Spawn" type="Marker2D" parent="Level4"]
 position = Vector2(-50, 25)
 
+[node name="ItemSpawn1" type="Marker2D" parent="Level4"]
+position = Vector2(-125, 125)
+
+[node name="ItemSpawn2" type="Marker2D" parent="Level4"]
+position = Vector2(125, 125)
+
+[node name="ItemSpawn3" type="Marker2D" parent="Level4"]
+position = Vector2(25, -75)
+
+[node name="ItemSpawn4" type="Marker2D" parent="Level4"]
+position = Vector2(-25, -75)
+
 [node name="Level5" type="Node2D" parent="."]
 position = Vector2(3200, 0)
 
@@ -201,6 +213,18 @@ position = Vector2(250, 100)
 
 [node name="Player4Spawn" type="Marker2D" parent="Level5"]
 position = Vector2(-250, 100)
+
+[node name="ItemSpawn1" type="Marker2D" parent="Level5"]
+position = Vector2(-225, -25)
+
+[node name="ItemSpawn2" type="Marker2D" parent="Level5"]
+position = Vector2(225, -25)
+
+[node name="ItemSpawn3" type="Marker2D" parent="Level5"]
+position = Vector2(100, 125)
+
+[node name="ItemSpawn4" type="Marker2D" parent="Level5"]
+position = Vector2(-100, 125)
 
 [node name="Level6" type="Node2D" parent="."]
 position = Vector2(4000, 0)
@@ -219,6 +243,18 @@ position = Vector2(75, 100)
 [node name="Player4Spawn" type="Marker2D" parent="Level6"]
 position = Vector2(-75, 100)
 
+[node name="ItemSpawn1" type="Marker2D" parent="Level6"]
+position = Vector2(-250, 125)
+
+[node name="ItemSpawn2" type="Marker2D" parent="Level6"]
+position = Vector2(250, 125)
+
+[node name="ItemSpawn3" type="Marker2D" parent="Level6"]
+position = Vector2(75, -50)
+
+[node name="ItemSpawn4" type="Marker2D" parent="Level6"]
+position = Vector2(-75, -50)
+
 [node name="Level7" type="Node2D" parent="."]
 position = Vector2(4800, 0)
 
@@ -235,6 +271,18 @@ position = Vector2(200, 100)
 
 [node name="Player4Spawn" type="Marker2D" parent="Level7"]
 position = Vector2(-200, 100)
+
+[node name="ItemSpawn1" type="Marker2D" parent="Level7"]
+position = Vector2(-100, 125)
+
+[node name="ItemSpawn2" type="Marker2D" parent="Level7"]
+position = Vector2(100, 125)
+
+[node name="ItemSpawn3" type="Marker2D" parent="Level7"]
+position = Vector2(75, -75)
+
+[node name="ItemSpawn4" type="Marker2D" parent="Level7"]
+position = Vector2(-75, -75)
 
 [node name="Level8" type="Node2D" parent="."]
 position = Vector2(5600, 0)
@@ -253,6 +301,18 @@ position = Vector2(250, 100)
 [node name="Player4Spawn" type="Marker2D" parent="Level8"]
 position = Vector2(-250, 100)
 
+[node name="ItemSpawn1" type="Marker2D" parent="Level8"]
+position = Vector2(-25, 125)
+
+[node name="ItemSpawn2" type="Marker2D" parent="Level8"]
+position = Vector2(25, 125)
+
+[node name="ItemSpawn3" type="Marker2D" parent="Level8"]
+position = Vector2(-175, -50)
+
+[node name="ItemSpawn4" type="Marker2D" parent="Level8"]
+position = Vector2(175, -50)
+
 [node name="Level9" type="Node2D" parent="."]
 position = Vector2(6400, 0)
 
@@ -270,6 +330,18 @@ position = Vector2(200, -100)
 [node name="Player4Spawn" type="Marker2D" parent="Level9"]
 position = Vector2(-200, -100)
 
+[node name="ItemSpawn1" type="Marker2D" parent="Level9"]
+position = Vector2(-100, -25)
+
+[node name="ItemSpawn2" type="Marker2D" parent="Level9"]
+position = Vector2(100, -25)
+
+[node name="ItemSpawn3" type="Marker2D" parent="Level9"]
+position = Vector2(175, 50)
+
+[node name="ItemSpawn4" type="Marker2D" parent="Level9"]
+position = Vector2(-175, 50)
+
 [node name="Level10" type="Node2D" parent="."]
 position = Vector2(7200, 0)
 
@@ -286,3 +358,15 @@ position = Vector2(150, -100)
 
 [node name="Player4Spawn" type="Marker2D" parent="Level10"]
 position = Vector2(-150, -100)
+
+[node name="ItemSpawn1" type="Marker2D" parent="Level10"]
+position = Vector2(-100, 25)
+
+[node name="ItemSpawn2" type="Marker2D" parent="Level10"]
+position = Vector2(100, 25)
+
+[node name="ItemSpawn3" type="Marker2D" parent="Level10"]
+position = Vector2(125, -50)
+
+[node name="ItemSpawn4" type="Marker2D" parent="Level10"]
+position = Vector2(-125, -50)
