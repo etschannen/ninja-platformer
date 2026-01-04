@@ -1,9 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://0yn1hakplrn4"]
 
-[ext_resource type="Script" uid="uid://d3ehqkfb4bp5d" path="res://music.gd" id="1_tw4r6"]
+[ext_resource type="Script" uid="uid://d3ehqkfb4bp5d" path="res://globals.gd" id="1_tw4r6"]
 [ext_resource type="AudioStream" uid="uid://tvnh70dr6y82" path="res://Three Red Hearts - Box Jump.ogg" id="2_dsrwk"]
 
-[node name="Music" type="Node"]
+[node name="Globals" type="Node"]
 script = ExtResource("1_tw4r6")
 
 [node name="Song1" type="AudioStreamPlayer" parent="."]

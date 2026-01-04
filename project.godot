@@ -17,8 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-RoundData="*res://global_stats.tres"
-Music="*res://Music.tscn"
+Globals="*res://Globals.tscn"
 
 [display]
 

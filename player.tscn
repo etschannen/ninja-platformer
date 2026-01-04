@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3 uid="uid://bl7cbq2ma5mjj"]
+[gd_scene load_steps=38 format=3 uid="uid://bl7cbq2ma5mjj"]
 
 [ext_resource type="Script" uid="uid://b4xqkm8dmmdgk" path="res://player.gd" id="1_i3pqv"]
 [ext_resource type="Script" uid="uid://2i8vukneqwu1" path="res://player_stats.gd" id="2_1jxqw"]
@@ -215,6 +215,23 @@ tracks/0/keys = {
 "values": [12, 13, 14, 11]
 }
 
+[sub_resource type="Animation" id="Animation_7ahtn"]
+resource_name = "dead"
+length = 0.3
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Anchor/SpriteUpper:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [27, 28, 29]
+}
+
 [sub_resource type="Animation" id="Animation_ivps1"]
 resource_name = "hang"
 length = 0.1
@@ -293,6 +310,7 @@ _data = {
 &"attack_up": SubResource("Animation_q13i1"),
 &"attack_up_right": SubResource("Animation_pylmc"),
 &"climb": SubResource("Animation_urp6f"),
+&"dead": SubResource("Animation_7ahtn"),
 &"hang": SubResource("Animation_ivps1"),
 &"jump": SubResource("Animation_b26j0"),
 &"run": SubResource("Animation_2hs0m"),
@@ -523,6 +541,8 @@ _data = {
 
 [node name="Player" type="CharacterBody2D"]
 z_index = 50
+collision_layer = 32
+collision_mask = 33
 script = ExtResource("1_i3pqv")
 stats = SubResource("Resource_dw050")
 state = 0
@@ -530,14 +550,15 @@ state = 0
 [node name="Anchor" type="Node2D" parent="."]
 
 [node name="SpriteUpper" type="Sprite2D" parent="Anchor"]
-z_index = 1
+z_index = 3
 material = ExtResource("2_2hs0m")
 position = Vector2(-2, -13)
 texture = ExtResource("2_hqtel")
 offset = Vector2(16, 0)
-hframes = 27
+hframes = 30
 
 [node name="SpriteLower" type="Sprite2D" parent="Anchor"]
+z_index = 2
 material = ExtResource("2_2hs0m")
 position = Vector2(-2, -13)
 texture = ExtResource("3_sweqy")
@@ -547,12 +568,12 @@ frame = 6
 
 [node name="RayCastUpper" type="RayCast2D" parent="Anchor"]
 position = Vector2(5, -14)
-target_position = Vector2(5, 0)
+target_position = Vector2(2, 0)
 collision_mask = 2
 
 [node name="RayCastLower" type="RayCast2D" parent="Anchor"]
 position = Vector2(5, -5)
-target_position = Vector2(5, 0)
+target_position = Vector2(2, 0)
 collision_mask = 2
 
 [node name="Hitbox" type="Area2D" parent="Anchor"]
@@ -574,18 +595,19 @@ position = Vector2(0, -11)
 shape = SubResource("RectangleShape2D_2hs0m")
 
 [node name="StompRayLeft" type="RayCast2D" parent="Anchor"]
-position = Vector2(-6, 0)
+position = Vector2(-6, -1)
 target_position = Vector2(0, 5)
 collision_mask = 8
 collide_with_areas = true
 
 [node name="StompRayRight" type="RayCast2D" parent="Anchor"]
-position = Vector2(6, 0)
+position = Vector2(6, -1)
 target_position = Vector2(0, 5)
 collision_mask = 8
 collide_with_areas = true
 
 [node name="StompRayMiddle" type="RayCast2D" parent="Anchor"]
+position = Vector2(0, -1)
 target_position = Vector2(0, 5)
 collision_mask = 8
 collide_with_areas = true

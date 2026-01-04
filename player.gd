@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-enum STATE { MOVE, CLIMB, HIT }
+enum STATE { MOVE, CLIMB, HIT, DEAD }
 
 @export var stats: PlayerStats
 @export var state: = STATE.CLIMB
@@ -38,6 +38,7 @@ var attack_hold_timer = 0.0
 var attack_cooldown_timer = 0.0
 var jump_hold_timer = 0.0
 
+@onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
 @onready var sprite_upper: Sprite2D = $Anchor/SpriteUpper
 @onready var sprite_lower: Sprite2D = $Anchor/SpriteLower
@@ -58,8 +59,6 @@ var jump_hold_timer = 0.0
 @onready var hit_hurt_sound: AudioStreamPlayer = $HitHurtSound
 @onready var slash_sound: AudioStreamPlayer = $SlashSound
 
-@export var roundData = preload("res://global_stats.tres")
-
 func clothing_color(color):
 	sprite_upper.material.set_shader_parameter("clothing_end_color", color)
 	
@@ -69,15 +68,6 @@ func _ready() -> void:
 	var top_left = get_viewport().canvas_transform.affine_inverse()*Vector2(0,0)
 	var bottom_right = get_viewport().canvas_transform.affine_inverse()*viewport_size
 	screen_size = Rect2(top_left, bottom_right-top_left)
-	
-	stats.no_health.connect(func():
-		queue_free()
-		if player_id == 0:
-			roundData.blue_score += 1
-		else:
-			roundData.red_score += 1
-		get_tree().current_scene.player_killed()
-	)
 	
 	sprite_lower.material.set_shader_parameter("flash_color", Color("ff4d4d"))
 	
@@ -93,24 +83,42 @@ func _ready() -> void:
 	)
 	
 	hurtbox.hurt.connect(func(other_hitbox: Hitbox, stomp):
+		if stats.health <= 0:
+			return
 		if !stomp && attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time:
 			return
 		hit_hurt_sound.play()
 		
-		var x_direction = sign(other_hitbox.global_position.direction_to(global_position).x)
-		if x_direction == 0: x_direction = -1
-			 
-		velocity.x = x_direction * dash_amt_finish
-		@warning_ignore("integer_division")
-		jump(jump_amount/2)
-		
-		state = STATE.HIT
-		shaker_upper.shake(3, 0.3)
-		shaker_lower.shake(3, 0.3)
-		animation_player_lower.play("jump")
-		effects_animation_player.play("hitflash")
 		@warning_ignore("narrowing_conversion")
 		stats.health -= other_hitbox.damage
+		
+		if stats.health <= 0:
+			hurtbox.set_collision_layer_value(4,false)
+			player.set_collision_layer_value(6, false)
+			player.set_collision_mask_value(6, false)
+			sprite_upper.z_index = 1
+			sprite_lower.z_index = 0
+			
+			state = STATE.DEAD
+			animation_player_upper.play("dead")
+			if player_id == 0:
+				Globals.roundData.blue_score += 1
+			else:
+				Globals.roundData.red_score += 1
+			get_tree().current_scene.player_killed()
+		else:
+			var x_direction = sign(other_hitbox.global_position.direction_to(global_position).x)
+			if x_direction == 0: x_direction = -1
+				 
+			velocity.x = x_direction * dash_amt_finish
+			@warning_ignore("integer_division")
+			jump(jump_amount/2)
+			
+			state = STATE.HIT
+			shaker_upper.shake(3, 0.3)
+			shaker_lower.shake(3, 0.3)
+			animation_player_lower.play("jump")
+			effects_animation_player.play("hitflash")
 	)
 
 func update_dash_velocity():
@@ -265,6 +273,10 @@ func _physics_process(delta: float) -> void:
 				state = STATE.MOVE
 		
 		STATE.HIT:
+			move_and_slide()
+			#apply_friction(delta)
+			#apply_gravity(delta)
+		STATE.DEAD:
 			move_and_slide()
 			#apply_friction(delta)
 			#apply_gravity(delta)

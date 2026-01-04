@@ -6,7 +6,6 @@ const PLAYER_SCENE = preload("res://player.tscn")
 @onready var camera: = $Camera
 
 var player_is_dead = false
-@export var roundData = preload("res://global_stats.tres")
 
 func _ready() -> void:
 	var rng = RandomNumberGenerator.new()
@@ -32,12 +31,12 @@ func _ready() -> void:
 	get_tree().current_scene.add_child(player1)
 	player1.global_position =  get_node(levelText+"/Player1Spawn").global_position
 	player1.clothing_color(Color8(8,135,206,255))
-	player1.player_id = 0
+	player1.player_id = 1
 	
 	get_tree().current_scene.add_child(player2)
 	player2.global_position = get_node(levelText+"/Player2Spawn").global_position
 	player2.clothing_color(Color8(194,11,11,255))
-	player2.player_id = 1
+	player2.player_id = 0
 	
 func _unhandled_input(event):
 	if event is InputEventKey && event.keycode == KEY_ESCAPE:
@@ -45,8 +44,8 @@ func _unhandled_input(event):
 		
 func player_killed():
 	if player_is_dead:
-		roundData.blue_score -= 1
-		roundData.red_score -= 1
+		Globals.roundData.blue_score -= 1
+		Globals.roundData.red_score -= 1
 		return
 	player_is_dead = true
 	await get_tree().create_timer(1.0).timeout
