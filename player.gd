@@ -87,6 +87,8 @@ func _ready() -> void:
 			return
 		if !stomp && attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time:
 			return
+		if is_dashing:
+			return
 		hit_hurt_sound.play()
 		
 		@warning_ignore("narrowing_conversion")
@@ -151,11 +153,6 @@ func _physics_process(delta: float) -> void:
 				
 			if attack_cooldown_timer < 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X)):
 				attack_hold_timer += delta
-				
-			if attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time:
-				sprite_lower.material.set_shader_parameter("block_enabled", true)
-			else:
-				sprite_lower.material.set_shader_parameter("block_enabled", false)
 			
 			if is_dashing:
 				if dash_timer <= 0:
@@ -163,6 +160,11 @@ func _physics_process(delta: float) -> void:
 					velocity = velocity_before_dash
 				else:
 					update_dash_velocity()
+					
+			if is_dashing || (attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time):
+				sprite_lower.material.set_shader_parameter("block_enabled", true)
+			else:
+				sprite_lower.material.set_shader_parameter("block_enabled", false)
 					
 			if stomp_ray_left.is_colliding():
 				var left_hurt = stomp_ray_left.get_collider()
@@ -215,16 +217,17 @@ func _physics_process(delta: float) -> void:
 					else:
 						animation_player_upper.play("attack_right")
 			
-			if x_input == 0:
-				apply_friction(delta)
-				animation_player_lower.play("stand")
-			else:
-				accelerate_horizontally(x_input, delta)
-				anchor.scale.x = sign(x_input)
-				animation_player_lower.play("run")
-			
-			if not is_on_floor():
-				animation_player_lower.play("jump")
+			if !is_dashing:
+				if x_input == 0:
+					apply_friction(delta)
+					animation_player_lower.play("stand")
+				else:
+					accelerate_horizontally(x_input, delta)
+					anchor.scale.x = sign(x_input)
+					animation_player_lower.play("run")
+				
+				if not is_on_floor():
+					animation_player_lower.play("jump")
 			
 			if dash_cooldown_timer <= 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) || Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) >= 0.5):
 				dash(x_input, y_input)
@@ -240,6 +243,8 @@ func _physics_process(delta: float) -> void:
 				coyote_time = 0.1
 			
 			if should_wall_climb():
+				is_dashing = false
+				sprite_lower.material.set_shader_parameter("block_enabled", false)
 				animation_player_upper.play("hang")
 				state = STATE.CLIMB
 			
@@ -295,6 +300,8 @@ func dash(x_input, y_input) -> void:
 		input_dir.x = anchor.scale.x
 	
 	is_dashing = true
+	animation_player_upper.play("dash")
+	animation_player_lower.play("dash")
 	dash_timer = dash_time+dash_stop_time
 	dash_cooldown_timer = dash_cooldown
 	
