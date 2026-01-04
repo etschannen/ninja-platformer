@@ -72,7 +72,7 @@ func _ready() -> void:
 	sprite_lower.material.set_shader_parameter("flash_color", Color("ff4d4d"))
 	
 	animation_player_lower.current_animation_changed.connect(func(animation_name: String):
-		if animation_player_upper.current_animation.begins_with("attack"): return
+		if animation_player_upper.current_animation.begins_with("attack") || stats.health <= 0: return
 		animation_player_upper.play(animation_name)
 	)
 	
@@ -282,9 +282,26 @@ func _physics_process(delta: float) -> void:
 			#apply_friction(delta)
 			#apply_gravity(delta)
 		STATE.DEAD:
+			if !is_on_floor():
+				velocity.y -= air_adjust
+				
+			apply_gravity(delta)
+			
+			apply_friction(delta)
+			animation_player_lower.play("stand")
+			
+			if not is_on_floor():
+				animation_player_lower.play("jump")
+			
+			var was_on_floor: = is_on_floor()
+			if !is_on_floor():
+				air_adjust = y_input*air_adjust_amount
+				velocity.y += air_adjust
 			move_and_slide()
-			#apply_friction(delta)
-			#apply_gravity(delta)
+			if is_on_floor():
+				air_adjust = 0
+			if was_on_floor and not is_on_floor() and velocity.y >= 0:
+				coyote_time = 0.1
 
 func wrapping_screen():
 	position.x = wrapf(position.x, screen_size.position.x, screen_size.position.x + screen_size.size.x)
