@@ -629,12 +629,12 @@ offset = Vector2(16, 0)
 hframes = 16
 frame = 6
 
-[node name="Health1" type="Sprite2D" parent="Anchor"]
-position = Vector2(-8, -27)
+[node name="Health2" type="Sprite2D" parent="Anchor"]
+position = Vector2(-10, -27)
 texture = ExtResource("6_ivps1")
 
-[node name="Health2" type="Sprite2D" parent="Anchor"]
-position = Vector2(0, -27)
+[node name="Health1" type="Sprite2D" parent="Anchor"]
+position = Vector2(-1, -27)
 texture = ExtResource("6_ivps1")
 
 [node name="Health3" type="Sprite2D" parent="Anchor"]
