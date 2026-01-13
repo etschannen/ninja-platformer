@@ -65,6 +65,9 @@ var ghost_timer = 0.0
 @onready var slash_sound: AudioStreamPlayer = $SlashSound
 @onready var particles: GPUParticles2D = $GPUParticles2D
 @onready var particles_material: ParticleProcessMaterial = $GPUParticles2D.process_material
+@onready var health_1: Sprite2D = $Anchor/Health1
+@onready var health_2: Sprite2D = $Anchor/Health2
+@onready var health_3: Sprite2D = $Anchor/Health3
 
 func clothing_color(color):
 	player_color = color
@@ -103,6 +106,7 @@ func _ready() -> void:
 		
 		@warning_ignore("narrowing_conversion")
 		stats.health -= other_hitbox.damage
+		animate_health(stats.health)
 		
 		if stats.health <= 0:
 			remove_collision()
@@ -128,6 +132,11 @@ func _ready() -> void:
 			animation_player_lower.play("jump")
 			effects_animation_player.play("hitflash")
 	)
+	
+func animate_health(new_health):
+	health_1.visible = new_health >= 1
+	health_2.visible = new_health >= 2
+	health_3.visible = new_health >= 3
 
 func update_dash_velocity():
 	if dash_timer < dash_stop_time:
@@ -165,6 +174,7 @@ func add_ghost():
 	ghost.animation_player_lower.pause()
 	ghost.anchor.scale = anchor.scale
 	ghost.sprite_lower.material.set_shader_parameter("alpha", 0.5)
+	ghost.animate_health(0)
 
 func _physics_process(delta: float) -> void:
 	if is_ghost:

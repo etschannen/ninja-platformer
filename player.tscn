@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://bl7cbq2ma5mjj"]
+[gd_scene load_steps=46 format=3 uid="uid://bl7cbq2ma5mjj"]
 
 [ext_resource type="Script" uid="uid://b4xqkm8dmmdgk" path="res://player.gd" id="1_i3pqv"]
 [ext_resource type="Script" uid="uid://2i8vukneqwu1" path="res://player_stats.gd" id="2_1jxqw"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bch8duwf6eai4" path="res://ninja_lower.png" id="3_sweqy"]
 [ext_resource type="Script" uid="uid://cqxr3go31xf5c" path="res://hitbox.gd" id="4_hqtel"]
 [ext_resource type="Script" uid="uid://qjrnpv4tbvkp" path="res://hurtbox.gd" id="5_sweqy"]
+[ext_resource type="Texture2D" uid="uid://coqfn8c3wvhyq" path="res://heart.png" id="6_ivps1"]
 [ext_resource type="AudioStream" uid="uid://bvkb63cwyd0ca" path="res://dash.wav" id="8_b26j0"]
 [ext_resource type="AudioStream" uid="uid://bnkeqe3gqh3x7" path="res://jump.wav" id="8_dw050"]
 [ext_resource type="AudioStream" uid="uid://b1psmyy57hppb" path="res://hitHurt.wav" id="8_n7ghd"]
@@ -627,6 +628,18 @@ texture = ExtResource("3_sweqy")
 offset = Vector2(16, 0)
 hframes = 16
 frame = 6
+
+[node name="Health1" type="Sprite2D" parent="Anchor"]
+position = Vector2(-8, -27)
+texture = ExtResource("6_ivps1")
+
+[node name="Health2" type="Sprite2D" parent="Anchor"]
+position = Vector2(0, -27)
+texture = ExtResource("6_ivps1")
+
+[node name="Health3" type="Sprite2D" parent="Anchor"]
+position = Vector2(8, -27)
+texture = ExtResource("6_ivps1")
 
 [node name="RayCastUpper" type="RayCast2D" parent="Anchor"]
 position = Vector2(5, -14)
