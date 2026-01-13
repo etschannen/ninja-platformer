@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const PLAYER_SCENE = preload("res://player.tscn")
+
 enum STATE { MOVE, CLIMB, HIT, DEAD }
 
 @export var stats: PlayerStats
@@ -18,6 +20,7 @@ enum STATE { MOVE, CLIMB, HIT, DEAD }
 @export var air_adjust_amount: = 75
 @export var device_id: = 0
 @export var player_id: = 0
+@export var player_color: = Color8(255,255,255,255)
 @export var dash_amt_start: = 500
 @export var dash_amt_finish: = 180
 @export var dash_time: = 0.10
@@ -37,6 +40,8 @@ var screen_size = Rect2(0,0,1,1)
 var attack_hold_timer = 0.0
 var attack_cooldown_timer = 0.0
 var jump_hold_timer = 0.0
+var is_ghost = false
+var ghost_timer = 0.0
 
 @onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
@@ -62,8 +67,8 @@ var jump_hold_timer = 0.0
 @onready var particles_material: ParticleProcessMaterial = $GPUParticles2D.process_material
 
 func clothing_color(color):
-	sprite_upper.material.set_shader_parameter("clothing_end_color", color)
-	
+	player_color = color
+	sprite_upper.material.set_shader_parameter("clothing_end_color", player_color)
 
 func _ready() -> void:
 	var viewport_size = get_viewport_rect().size
@@ -84,6 +89,9 @@ func _ready() -> void:
 		animation_player_upper.seek(animation_player_lower.current_animation_position)
 	)
 	
+	if is_ghost:
+		remove_collision()
+	
 	hurtbox.hurt.connect(func(other_hitbox: Hitbox, stomp):
 		if stats.health <= 0:
 			return
@@ -97,11 +105,7 @@ func _ready() -> void:
 		stats.health -= other_hitbox.damage
 		
 		if stats.health <= 0:
-			hurtbox.set_collision_layer_value(4,false)
-			player.set_collision_layer_value(6, false)
-			player.set_collision_mask_value(6, false)
-			sprite_upper.z_index = 1
-			sprite_lower.z_index = 0
+			remove_collision()
 			
 			state = STATE.DEAD
 			animation_player_upper.play("dead")
@@ -138,7 +142,38 @@ func update_dash_velocity():
 #	if event is InputEventJoypadButton:
 #		print("Button: ", event.button_index, "Pressed: ", event.pressed, "Device: ", event.device)
 
+func remove_collision():
+	hurtbox.set_collision_layer_value(4,false)
+	player.set_collision_layer_value(6, false)
+	player.set_collision_mask_value(6, false)
+	sprite_upper.z_index = 1
+	sprite_lower.z_index = 0
+
+func add_ghost():
+	var ghost = PLAYER_SCENE.instantiate()
+	ghost.device_id = device_id
+	ghost.player_id = player_id
+	ghost.global_position = global_position
+	ghost.is_ghost = true
+	get_tree().current_scene.add_child(ghost)
+	ghost.clothing_color(player_color)
+	ghost.animation_player_upper.play(animation_player_upper.current_animation)
+	ghost.animation_player_upper.seek(animation_player_upper.current_animation_position)
+	ghost.animation_player_upper.pause()
+	ghost.animation_player_lower.play(animation_player_lower.current_animation)
+	ghost.animation_player_lower.seek(animation_player_lower.current_animation_position)
+	ghost.animation_player_lower.pause()
+	ghost.anchor.scale = anchor.scale
+	ghost.sprite_lower.material.set_shader_parameter("alpha", 0.5)
+
 func _physics_process(delta: float) -> void:
+	if is_ghost:
+		ghost_timer += delta
+		sprite_lower.material.set_shader_parameter("alpha", 1.0-((0.2+ghost_timer)/0.4))
+		if ghost_timer > 0.2:
+			queue_free()
+		return
+	
 	wrapping_screen()
 	var y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
 	var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
@@ -146,6 +181,7 @@ func _physics_process(delta: float) -> void:
 		x_input = 0
 	if abs(y_input) < 0.2:
 		y_input = 0
+		
 	match state:
 		STATE.MOVE:
 			dash_timer -= delta
@@ -157,6 +193,10 @@ func _physics_process(delta: float) -> void:
 				attack_hold_timer += delta
 			
 			if is_dashing:
+				ghost_timer += delta
+				if ghost_timer > 0.05:
+					ghost_timer = 0.0
+					add_ghost()
 				if dash_timer <= 0:
 					is_dashing = false
 					particles.emitting = false
@@ -165,9 +205,9 @@ func _physics_process(delta: float) -> void:
 					update_dash_velocity()
 					
 			if is_dashing || (attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time):
-				sprite_lower.material.set_shader_parameter("block_enabled", true)
+				sprite_lower.material.set_shader_parameter("alpha", 0.5)
 			else:
-				sprite_lower.material.set_shader_parameter("block_enabled", false)
+				sprite_lower.material.set_shader_parameter("alpha", 1.0)
 					
 			if stomp_ray_left.is_colliding():
 				var left_hurt = stomp_ray_left.get_collider()
@@ -248,7 +288,7 @@ func _physics_process(delta: float) -> void:
 			if should_wall_climb():
 				is_dashing = false
 				particles.emitting = false
-				sprite_lower.material.set_shader_parameter("block_enabled", false)
+				sprite_lower.material.set_shader_parameter("alpha", 1.0)
 				animation_player_upper.play("hang")
 				state = STATE.CLIMB
 			
@@ -320,6 +360,7 @@ func dash(x_input, y_input) -> void:
 	if input_dir.x == 0 && input_dir.y == 0:
 		input_dir.x = anchor.scale.x
 	
+	ghost_timer = 0
 	is_dashing = true
 	particles.emitting = true
 	particles_material.direction.x = -1*input_dir.x
