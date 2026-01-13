@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 const PLAYER_SCENE = preload("res://player.tscn")
+const SPARK_PARTICLE_BURST_EFFECT = preload("res://sparks_particle_burst_effect.tscn")
 
 enum STATE { MOVE, CLIMB, HIT, DEAD }
 
@@ -42,6 +43,7 @@ var attack_cooldown_timer = 0.0
 var jump_hold_timer = 0.0
 var is_ghost = false
 var ghost_timer = 0.0
+var blood_timer = 0.0
 
 @onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
@@ -63,8 +65,10 @@ var ghost_timer = 0.0
 @onready var dash_sound: AudioStreamPlayer = $DashSound
 @onready var hit_hurt_sound: AudioStreamPlayer = $HitHurtSound
 @onready var slash_sound: AudioStreamPlayer = $SlashSound
-@onready var particles: GPUParticles2D = $GPUParticles2D
-@onready var particles_material: ParticleProcessMaterial = $GPUParticles2D.process_material
+@onready var dash_particles: GPUParticles2D = $DashParticles
+@onready var dash_particles_material: ParticleProcessMaterial = $DashParticles.process_material
+@onready var blood_particles: GPUParticles2D = $BloodParticles
+@onready var blood_particles_material: ParticleProcessMaterial = $BloodParticles.process_material
 @onready var health_1: Sprite2D = $Anchor/Health1
 @onready var health_2: Sprite2D = $Anchor/Health2
 @onready var health_3: Sprite2D = $Anchor/Health3
@@ -98,10 +102,20 @@ func _ready() -> void:
 	hurtbox.hurt.connect(func(other_hitbox: Hitbox, stomp):
 		if stats.health <= 0:
 			return
-		if !stomp && attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time:
-			return
-		if is_dashing:
-			return
+		
+		var dir = other_hitbox.global_position.direction_to(global_position)
+		if !stomp:
+			if is_dashing || (attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time):
+				var spark_particle = SPARK_PARTICLE_BURST_EFFECT.instantiate()
+				get_tree().current_scene.add_child(spark_particle)
+				spark_particle.global_position = sprite_upper.global_position
+				return
+			
+			blood_particles.emitting = true
+			blood_particles_material.direction.x = dir.x
+			blood_particles_material.direction.y = dir.y
+			blood_timer = 0.1
+		
 		hit_hurt_sound.play()
 		
 		@warning_ignore("narrowing_conversion")
@@ -119,7 +133,7 @@ func _ready() -> void:
 				Globals.roundData.red_score += 1
 			get_tree().current_scene.player_killed()
 		else:
-			var x_direction = sign(other_hitbox.global_position.direction_to(global_position).x)
+			var x_direction = sign(dir.x)
 			if x_direction == 0: x_direction = -1
 				 
 			velocity.x = x_direction * dash_amt_finish
@@ -192,6 +206,11 @@ func _physics_process(delta: float) -> void:
 	if abs(y_input) < 0.2:
 		y_input = 0
 		
+	if blood_particles.emitting:
+		blood_timer -= delta
+		if blood_timer < 0:
+			blood_particles.emitting = false
+		
 	match state:
 		STATE.MOVE:
 			dash_timer -= delta
@@ -209,7 +228,7 @@ func _physics_process(delta: float) -> void:
 					add_ghost()
 				if dash_timer <= 0:
 					is_dashing = false
-					particles.emitting = false
+					dash_particles.emitting = false
 					velocity = velocity_before_dash
 				else:
 					update_dash_velocity()
@@ -297,7 +316,7 @@ func _physics_process(delta: float) -> void:
 			
 			if should_wall_climb():
 				is_dashing = false
-				particles.emitting = false
+				dash_particles.emitting = false
 				sprite_lower.material.set_shader_parameter("alpha", 1.0)
 				animation_player_upper.play("hang")
 				state = STATE.CLIMB
@@ -333,8 +352,6 @@ func _physics_process(delta: float) -> void:
 		
 		STATE.HIT:
 			move_and_slide()
-			#apply_friction(delta)
-			#apply_gravity(delta)
 		STATE.DEAD:
 			if !is_on_floor():
 				velocity.y -= air_adjust
@@ -372,9 +389,9 @@ func dash(x_input, y_input) -> void:
 	
 	ghost_timer = 0
 	is_dashing = true
-	particles.emitting = true
-	particles_material.direction.x = -1*input_dir.x
-	particles_material.direction.y = -1*input_dir.y
+	dash_particles.emitting = true
+	dash_particles_material.direction.x = -1*input_dir.x
+	dash_particles_material.direction.y = -1*input_dir.y
 	animation_player_upper.play("dash")
 	animation_player_lower.play("dash")
 	dash_timer = dash_time+dash_stop_time
