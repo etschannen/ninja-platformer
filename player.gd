@@ -103,7 +103,7 @@ func _ready() -> void:
 		if stats.health <= 0:
 			return
 		
-		var dir = other_hitbox.global_position.direction_to(global_position)
+		var dir = other_hitbox.global_position.direction_to(hitbox.global_position)
 		if !stomp:
 			if is_dashing || (attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time):
 				var spark_particle = SPARK_PARTICLE_BURST_EFFECT.instantiate()
