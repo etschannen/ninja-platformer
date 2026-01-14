@@ -107,10 +107,11 @@ func _ready() -> void:
 		if !stomp:
 			if is_dashing || (attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time):
 				var spark_particle = SPARK_PARTICLE_BURST_EFFECT.instantiate()
-				get_tree().current_scene.add_child(spark_particle)
+				add_child(spark_particle)
 				spark_particle.global_position = sprite_upper.global_position
+				spark_particle.set_dir(dir)
 				return
-			
+				
 			blood_particles.emitting = true
 			blood_particles_material.direction.x = dir.x
 			blood_particles_material.direction.y = dir.y
