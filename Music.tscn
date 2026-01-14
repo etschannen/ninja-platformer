@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2wqqj2kvg2i7"]
+
+[ext_resource type="Script" path="res://music.gd" id="1_tw4r6"]
+[ext_resource type="AudioStream" uid="uid://tvnh70dr6y82" path="res://Three Red Hearts - Box Jump.ogg" id="2_dsrwk"]
+
+[node name="Music" type="Node"]
+script = ExtResource("1_tw4r6")
+
+[node name="Song1" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_dsrwk")
+autoplay = true
