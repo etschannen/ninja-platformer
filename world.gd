@@ -1,6 +1,7 @@
 extends Node2D
 
 const PLAYER_SCENE = preload("res://player.tscn")
+const POWERUP_SCENE = preload("res://powerup.tscn")
 @onready var level1: = $Level1
 @onready var level2: = $Level2
 @onready var camera: = $Camera
@@ -37,6 +38,12 @@ func _ready() -> void:
 	player2.global_position = get_node(levelText+"/Player2Spawn").global_position
 	player2.clothing_color(Color8(194,11,11,255))
 	player2.player_id = 0
+	
+	var powerupNumber = rng.randi_range(1,4)
+	var powerup1 = POWERUP_SCENE.instantiate()
+	
+	get_tree().current_scene.add_child(powerup1)
+	powerup1.global_position = get_node(levelText+"/ItemSpawn"+str(powerupNumber)).global_position
 	
 func _unhandled_input(event):
 	if event is InputEventKey && event.keycode == KEY_ESCAPE:

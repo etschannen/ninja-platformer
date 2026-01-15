@@ -72,6 +72,7 @@ var blood_timer = 0.0
 @onready var health_1: Sprite2D = $Anchor/Health1
 @onready var health_2: Sprite2D = $Anchor/Health2
 @onready var health_3: Sprite2D = $Anchor/Health3
+@onready var hat: Sprite2D = $Anchor/Hat
 
 func clothing_color(color):
 	player_color = color
@@ -100,6 +101,11 @@ func _ready() -> void:
 		remove_collision()
 	
 	hurtbox.hurt.connect(func(other_hitbox: Hitbox, stomp):
+		if other_hitbox.damage == 0:
+			hat.visible = true
+			dash_time = 0.2
+			return
+		
 		if stats.health <= 0:
 			return
 		

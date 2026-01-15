@@ -1,0 +1,52 @@
+[gd_scene load_steps=9 format=3 uid="uid://couyk3mxnfx3u"]
+
+[ext_resource type="Script" uid="uid://c6en00b84oto3" path="res://powerup.gd" id="1_to7bl"]
+[ext_resource type="Texture2D" uid="uid://kx71bccl7lm0" path="res://hat.png" id="2_to7bl"]
+[ext_resource type="Script" uid="uid://cqxr3go31xf5c" path="res://hitbox.gd" id="3_iuyn8"]
+[ext_resource type="Script" uid="uid://qjrnpv4tbvkp" path="res://hurtbox.gd" id="4_fo5kl"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xu7g1"]
+atlas = ExtResource("2_to7bl")
+region = Rect2(0, 0, 9, 6)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6cuax"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xu7g1")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_b7duk"]
+radius = 2.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_t2bd8"]
+radius = 3.0
+
+[node name="Powerup" type="Node2D"]
+script = ExtResource("1_to7bl")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_6cuax")
+autoplay = "default"
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 9
+script = ExtResource("3_iuyn8")
+metadata/_custom_type_script = "uid://cqxr3go31xf5c"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_b7duk")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("4_fo5kl")
+metadata/_custom_type_script = "uid://qjrnpv4tbvkp"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_t2bd8")
