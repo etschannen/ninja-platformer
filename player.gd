@@ -174,6 +174,7 @@ func update_dash_velocity():
 
 func remove_collision():
 	hurtbox.set_collision_layer_value(4,false)
+	hitbox.set_collision_mask_value(4,false)
 	player.set_collision_layer_value(6, false)
 	player.set_collision_mask_value(6, false)
 	sprite_upper.z_index = 1
