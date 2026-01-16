@@ -30,7 +30,7 @@ func _ready() -> void:
 		player2.device_id = 0
 	
 	get_tree().current_scene.add_child(player1)
-	player1.global_position =  get_node(levelText+"/Player1Spawn").global_position
+	player1.global_position = get_node(levelText+"/Player1Spawn").global_position
 	player1.clothing_color(Color8(8,135,206,255))
 	player1.player_id = 1
 	
@@ -39,11 +39,23 @@ func _ready() -> void:
 	player2.clothing_color(Color8(194,11,11,255))
 	player2.player_id = 0
 	
-	var powerupNumber = rng.randi_range(1,4)
+	var powerupTypes = Globals.PowerupType.values().duplicate()
+	powerupTypes.erase(Globals.PowerupType.NONE)
+	
+	var powerupNumber1 = rng.randi_range(0,3)
 	var powerup1 = POWERUP_SCENE.instantiate()
 	
 	get_tree().current_scene.add_child(powerup1)
-	powerup1.global_position = get_node(levelText+"/ItemSpawn"+str(powerupNumber)).global_position
+	powerup1.global_position = get_node(levelText+"/ItemSpawn"+str(powerupNumber1+1)).global_position
+	powerup1.set_powerup_type(powerupTypes.pick_random())
+	powerupTypes.erase(powerup1.hitbox.powerup)
+	
+	var powerupNumber2 = rng.randi_range(1,3)
+	var powerup2 = POWERUP_SCENE.instantiate()
+	
+	get_tree().current_scene.add_child(powerup2)
+	powerup2.global_position = get_node(levelText+"/ItemSpawn"+str((powerupNumber1+powerupNumber2)%4+1)).global_position
+	powerup2.set_powerup_type(powerupTypes.pick_random())
 	
 func _unhandled_input(event):
 	if event is InputEventKey && event.keycode == KEY_ESCAPE:

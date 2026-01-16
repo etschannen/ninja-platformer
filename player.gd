@@ -18,10 +18,12 @@ enum STATE { MOVE, CLIMB, HIT, DEAD }
 @export var max_gravity: = 400
 @export var jump_amount: = 200
 @export var jump_charge: = 0.2
+@export var air_jump: = false
 @export var air_adjust_amount: = 75
 @export var device_id: = 0
 @export var player_id: = 0
 @export var player_color: = Color8(255,255,255,255)
+@export var hat_color: = Color8(0,0,0,255)
 @export var dash_amt_start: = 500
 @export var dash_amt_finish: = 180
 @export var dash_time: = 0.10
@@ -29,6 +31,7 @@ enum STATE { MOVE, CLIMB, HIT, DEAD }
 @export var dash_cooldown: = 0.5
 @export var attack_rebound_time: = 0.4
 @export var attack_cooldown: = 0.6
+@export var attack_charges: = 0
 
 var is_dashing: = false
 var dash_timer: = 0.0
@@ -40,10 +43,12 @@ var air_adjust = 0
 var screen_size = Rect2(0,0,1,1)
 var attack_hold_timer = 0.0
 var attack_cooldown_timer = 0.0
+var attack_charge = 0
 var jump_hold_timer = 0.0
 var is_ghost = false
 var ghost_timer = 0.0
 var blood_timer = 0.0
+
 
 @onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
@@ -77,6 +82,14 @@ var blood_timer = 0.0
 func clothing_color(color):
 	player_color = color
 	sprite_upper.material.set_shader_parameter("clothing_end_color", player_color)
+	
+func update_hat_color(color):
+	if hat.visible:
+		hat_color = hat_color + color
+	else:
+		hat.visible = true
+		hat_color = color
+	sprite_upper.material.set_shader_parameter("hat_end_color", hat_color)
 
 func _ready() -> void:
 	var viewport_size = get_viewport_rect().size
@@ -101,10 +114,25 @@ func _ready() -> void:
 		remove_collision()
 	
 	hurtbox.hurt.connect(func(other_hitbox: Hitbox, stomp):
-		if other_hitbox.damage == 0:
-			hat.visible = true
-			dash_time = 0.2
-			return
+		if other_hitbox.powerup != Globals.PowerupType.NONE:
+			update_hat_color(Globals.get_powerup_color(other_hitbox.powerup))
+		
+		match other_hitbox.powerup:
+			Globals.PowerupType.DASH:
+				dash_time += 0.1
+				return
+			Globals.PowerupType.ATTACK:
+				attack_charges += 1
+				return
+			Globals.PowerupType.BLOCK:
+				attack_rebound_time += 0.4
+				return
+			Globals.PowerupType.MOVEMENT:
+				max_speed += 100
+				return
+			Globals.PowerupType.JUMP:
+				air_jump = true
+				return
 		
 		if stats.health <= 0:
 			return
@@ -226,7 +254,12 @@ func _physics_process(delta: float) -> void:
 			attack_cooldown_timer -= delta
 			coyote_time -= delta
 				
-			if attack_cooldown_timer < 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X)):
+			if (attack_cooldown_timer < 0 || attack_charge < attack_charges) && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X)):
+				if attack_hold_timer <= 0:
+					if attack_cooldown_timer >= 0:
+						attack_charge += 1
+					else:
+						attack_charge = 0
 				attack_hold_timer += delta
 			
 			if is_dashing:
@@ -267,7 +300,7 @@ func _physics_process(delta: float) -> void:
 				
 			apply_gravity(delta)
 			
-			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) && (jump_hold_timer > 0 || (is_on_floor() or coyote_time > 0)):
+			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) && (jump_hold_timer > 0 || (is_on_floor() or coyote_time > 0 or air_jump)):
 				if jump_hold_timer == 0:
 					jump_sound.play()
 				jump_hold_timer += delta

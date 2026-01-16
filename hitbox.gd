@@ -1,6 +1,7 @@
 class_name Hitbox extends Area2D
 
 @export var damage: = 1.0
+@export var powerup: = Globals.PowerupType.NONE
 
 signal hit(hurtbox: Hurtbox)
 

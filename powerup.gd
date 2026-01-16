@@ -6,8 +6,6 @@ extends Node2D
 @onready var hurtbox: Hurtbox = $Hurtbox
 
 func _ready() -> void:
-	hitbox.damage = 0
-	
 	hitbox.body_entered.connect(func(body: Node2D):
 		queue_free()
 	)
@@ -17,3 +15,7 @@ func _ready() -> void:
 	hurtbox.hurt.connect(func(other_hitbox: Hitbox):
 		pass
 	)
+
+func set_powerup_type(powerup):
+	hitbox.powerup = powerup
+	animated_sprite_2d.material.set_shader_parameter("hat_end_color", Globals.get_powerup_color(powerup))

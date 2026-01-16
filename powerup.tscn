@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://couyk3mxnfx3u"]
+[gd_scene load_steps=10 format=3 uid="uid://couyk3mxnfx3u"]
 
 [ext_resource type="Script" uid="uid://c6en00b84oto3" path="res://powerup.gd" id="1_to7bl"]
 [ext_resource type="Texture2D" uid="uid://kx71bccl7lm0" path="res://hat.png" id="2_to7bl"]
+[ext_resource type="Material" uid="uid://dx10wnlxgh3sb" path="res://effects_material.tres" id="2_xu7g1"]
 [ext_resource type="Script" uid="uid://cqxr3go31xf5c" path="res://hitbox.gd" id="3_iuyn8"]
 [ext_resource type="Script" uid="uid://qjrnpv4tbvkp" path="res://hurtbox.gd" id="4_fo5kl"]
 
@@ -30,6 +31,7 @@ radius = 3.0
 script = ExtResource("1_to7bl")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+material = ExtResource("2_xu7g1")
 sprite_frames = SubResource("SpriteFrames_6cuax")
 autoplay = "default"
 
@@ -37,6 +39,7 @@ autoplay = "default"
 collision_layer = 0
 collision_mask = 9
 script = ExtResource("3_iuyn8")
+damage = null
 metadata/_custom_type_script = "uid://cqxr3go31xf5c"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
