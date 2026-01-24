@@ -33,7 +33,8 @@ enum STATE { MOVE, CLIMB, HIT, DEAD }
 @export var attack_cooldown: = 0.6
 @export var attack_charges: = 0
 @export var max_stretch = 0.2
-@export var stretch_reset_factor = 1
+@export var stretch_full_duration = 0.25
+@export var stretch_duration = 0.2
 
 var is_dashing: = false
 var dash_timer: = 0.0
@@ -51,6 +52,7 @@ var is_ghost = false
 var ghost_timer = 0.0
 var blood_timer = 0.0
 var current_stretch = 0
+var current_stretch_time = 0.0
 
 @onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
@@ -238,8 +240,6 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	wrapping_screen()
-	current_stretch = move_toward(current_stretch, 0, stretch_reset_factor * delta)
-	
 	
 	var y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
 	var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
@@ -309,6 +309,7 @@ func _physics_process(delta: float) -> void:
 			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) && (jump_hold_timer > 0 || (is_on_floor() or coyote_time > 0 or air_jump)):
 				if is_on_floor() or coyote_time > 0:
 					current_stretch = max_stretch
+					current_stretch_time = stretch_full_duration
 				if jump_hold_timer == 0:
 					jump_sound.play()
 				jump_hold_timer += delta
@@ -365,6 +366,7 @@ func _physics_process(delta: float) -> void:
 				coyote_time = 0.1
 			if not was_on_floor and is_on_floor() and prev_velocity >= -1*max_speed:
 				current_stretch = -1*max_stretch
+				current_stretch_time = stretch_full_duration
 			
 			if should_wall_climb():
 				is_dashing = false
@@ -426,8 +428,16 @@ func _physics_process(delta: float) -> void:
 			if was_on_floor and not is_on_floor() and velocity.y >= 0:
 				coyote_time = 0.1
 
-	player.scale = Vector2(Globals.default_scale-current_stretch, Globals.default_scale+current_stretch)
-	health_1.scale = Vector2(Globals.default_scale/(Globals.default_scale-current_stretch), Globals.default_scale/(Globals.default_scale+current_stretch))
+	var stretch_amount = 0
+	current_stretch_time -= delta
+	if current_stretch_time > 0:
+		if current_stretch_time > stretch_duration:
+			stretch_amount = current_stretch*(1.0-((current_stretch_time-stretch_duration)/(stretch_full_duration-stretch_duration)))
+		else:
+			stretch_amount = current_stretch*current_stretch_time/stretch_duration
+	
+	player.scale = Vector2(Globals.default_scale-stretch_amount, Globals.default_scale+stretch_amount)
+	health_1.scale = Vector2(Globals.default_scale/(Globals.default_scale-stretch_amount), Globals.default_scale/(Globals.default_scale+stretch_amount))
 	health_2.scale = health_1.scale
 	health_3.scale = health_1.scale
 
