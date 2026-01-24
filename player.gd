@@ -32,6 +32,9 @@ enum STATE { MOVE, CLIMB, HIT, DEAD }
 @export var attack_rebound_time: = 0.4
 @export var attack_cooldown: = 0.6
 @export var attack_charges: = 0
+@export var max_stretch = 0.2
+@export var stretch_full_duration = 0.25
+@export var stretch_duration = 0.2
 
 var is_dashing: = false
 var dash_timer: = 0.0
@@ -48,7 +51,8 @@ var jump_hold_timer = 0.0
 var is_ghost = false
 var ghost_timer = 0.0
 var blood_timer = 0.0
-
+var current_stretch = 0
+var current_stretch_time = 0.0
 
 @onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
@@ -222,6 +226,7 @@ func add_ghost():
 	ghost.animation_player_lower.play(animation_player_lower.current_animation)
 	ghost.animation_player_lower.seek(animation_player_lower.current_animation_position)
 	ghost.animation_player_lower.pause()
+	ghost.player.scale = player.scale
 	ghost.anchor.scale = anchor.scale
 	ghost.sprite_lower.material.set_shader_parameter("alpha", 0.5)
 	ghost.animate_health(0)
@@ -235,6 +240,7 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	wrapping_screen()
+	
 	var y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
 	var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
 	if abs(x_input) < 0.2:
@@ -301,6 +307,9 @@ func _physics_process(delta: float) -> void:
 			apply_gravity(delta)
 			
 			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) && (jump_hold_timer > 0 || (is_on_floor() or coyote_time > 0 or air_jump)):
+				if is_on_floor() or coyote_time > 0:
+					current_stretch = max_stretch
+					current_stretch_time = stretch_full_duration
 				if jump_hold_timer == 0:
 					jump_sound.play()
 				jump_hold_timer += delta
@@ -346,6 +355,7 @@ func _physics_process(delta: float) -> void:
 				dash(x_input, y_input)
 			
 			var was_on_floor: = is_on_floor()
+			var prev_velocity = velocity.y
 			if !is_on_floor():
 				air_adjust = y_input*air_adjust_amount
 				velocity.y += air_adjust
@@ -354,6 +364,9 @@ func _physics_process(delta: float) -> void:
 				air_adjust = 0
 			if was_on_floor and not is_on_floor() and velocity.y >= 0:
 				coyote_time = 0.1
+			if not was_on_floor and is_on_floor() and prev_velocity >= -1*max_speed:
+				current_stretch = -1*max_stretch
+				current_stretch_time = stretch_full_duration
 			
 			if should_wall_climb():
 				is_dashing = false
@@ -414,6 +427,19 @@ func _physics_process(delta: float) -> void:
 				air_adjust = 0
 			if was_on_floor and not is_on_floor() and velocity.y >= 0:
 				coyote_time = 0.1
+
+	var stretch_amount = 0
+	current_stretch_time -= delta
+	if current_stretch_time > 0:
+		if current_stretch_time > stretch_duration:
+			stretch_amount = current_stretch*(1.0-((current_stretch_time-stretch_duration)/(stretch_full_duration-stretch_duration)))
+		else:
+			stretch_amount = current_stretch*current_stretch_time/stretch_duration
+	
+	player.scale = Vector2(Globals.default_scale-stretch_amount, Globals.default_scale+stretch_amount)
+	health_1.scale = Vector2(Globals.default_scale/(Globals.default_scale-stretch_amount), Globals.default_scale/(Globals.default_scale+stretch_amount))
+	health_2.scale = health_1.scale
+	health_3.scale = health_1.scale
 
 func wrapping_screen():
 	position.x = wrapf(position.x, screen_size.position.x, screen_size.position.x + screen_size.size.x)

@@ -39,23 +39,20 @@ func _ready() -> void:
 	player2.clothing_color(Color8(194,11,11,255))
 	player2.player_id = 0
 	
-	var powerupTypes = Globals.PowerupType.values().duplicate()
-	powerupTypes.erase(Globals.PowerupType.NONE)
+	var powerups = range(1,5)
+	var durations = [3.0, 6.0, 10.0]
+	for num in range(0,rng.randi() % 5):
+		powerups.remove_at(rng.randi() % powerups.size())
 	
-	var powerupNumber1 = rng.randi_range(0,3)
-	var powerup1 = POWERUP_SCENE.instantiate()
-	
-	get_tree().current_scene.add_child(powerup1)
-	powerup1.global_position = get_node(levelText+"/ItemSpawn"+str(powerupNumber1+1)).global_position
-	powerup1.set_powerup_type(powerupTypes.pick_random())
-	powerupTypes.erase(powerup1.hitbox.powerup)
-	
-	var powerupNumber2 = rng.randi_range(1,3)
-	var powerup2 = POWERUP_SCENE.instantiate()
-	
-	get_tree().current_scene.add_child(powerup2)
-	powerup2.global_position = get_node(levelText+"/ItemSpawn"+str((powerupNumber1+powerupNumber2)%4+1)).global_position
-	powerup2.set_powerup_type(powerupTypes.pick_random())
+	for pow in powerups:
+		var powerupType = Globals.PowerupType.NONE
+		while powerupType == Globals.PowerupType.NONE:
+			powerupType = Globals.PowerupType.values().pick_random()
+
+		var powerup = POWERUP_SCENE.instantiate()
+		get_tree().current_scene.add_child(powerup)
+		powerup.global_position = get_node(levelText+"/ItemSpawn"+str(pow)).global_position
+		powerup.set_powerup_type(powerupType, durations.pick_random())
 	
 func _unhandled_input(event):
 	if event is InputEventKey && event.keycode == KEY_ESCAPE:
