@@ -1,4 +1,5 @@
 extends Node
+@onready var song_1: AudioStreamPlayer = $Song1
 
 enum PowerupType {
 	NONE,
@@ -8,6 +9,11 @@ enum PowerupType {
 	MOVEMENT,
 	JUMP
 }
+
+func _ready():
+	await get_tree().create_timer(3.0).timeout
+	song_1.play()
+	
 
 func get_powerup_color(powerup):
 	match powerup:
