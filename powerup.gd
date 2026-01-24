@@ -1,11 +1,12 @@
 extends Node2D
 
-
+@onready var powerup: Node2D = $"."
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Hitbox = $Hitbox
 @onready var hurtbox: Hurtbox = $Hurtbox
 
 func _ready() -> void:
+	powerup.scale = Vector2(Globals.default_scale, Globals.default_scale)
 	hitbox.body_entered.connect(func(body: Node2D):
 		queue_free()
 	)

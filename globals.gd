@@ -24,3 +24,4 @@ func get_powerup_color(powerup):
 		
 
 @export var roundData = preload("res://global_stats.tres")
+@export var default_scale = 1.4
