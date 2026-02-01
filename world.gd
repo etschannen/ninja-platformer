@@ -40,7 +40,7 @@ func _ready() -> void:
 	player2.player_id = 0
 	
 	var powerups = range(1,5)
-	var durations = [3.0, 6.0, 10.0]
+	var durations = [3.5, 5.5, 7.5, 9.5]
 	for num in range(0,rng.randi() % 5):
 		powerups.remove_at(rng.randi() % powerups.size())
 	

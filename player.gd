@@ -407,26 +407,11 @@ func _physics_process(delta: float) -> void:
 		STATE.HIT:
 			move_and_slide()
 		STATE.DEAD:
-			if !is_on_floor():
-				velocity.y -= air_adjust
-				
+			is_dashing = false
 			apply_gravity(delta)
-			
 			apply_friction(delta)
 			animation_player_lower.play("stand")
-			
-			if not is_on_floor():
-				animation_player_lower.play("jump")
-			
-			var was_on_floor: = is_on_floor()
-			if !is_on_floor():
-				air_adjust = y_input*air_adjust_amount
-				velocity.y += air_adjust
 			move_and_slide()
-			if is_on_floor():
-				air_adjust = 0
-			if was_on_floor and not is_on_floor() and velocity.y >= 0:
-				coyote_time = 0.1
 
 	var stretch_amount = 0
 	current_stretch_time -= delta

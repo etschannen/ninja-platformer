@@ -6,8 +6,6 @@ extends Node2D
 @onready var hurtbox: Hurtbox = $Hurtbox
 
 var spawn_duration = 0.0
-var full_spawn_duration = 0.0
-var timer_color = Color8(0,0,0)
 
 func _ready() -> void:
 	powerup.scale = Vector2(Globals.default_scale, Globals.default_scale)
@@ -22,10 +20,16 @@ func _ready() -> void:
 	)
 	
 func _physics_process(delta: float) -> void:
-	if spawn_duration > 0.0:
+	if spawn_duration > 2.5:
+		powerup.visible = false
+		spawn_duration -= delta
+		queue_redraw()
+	elif spawn_duration > 0.0:
+		powerup.visible = true
 		spawn_duration -= delta
 		queue_redraw()
 	elif spawn_duration < 0.0:
+		powerup.visible = true
 		spawn_duration = 0.0
 		animated_sprite_2d.material.set_shader_parameter("alpha", 1.0)
 		hitbox.set_collision_mask_value(1,true)
@@ -36,20 +40,13 @@ func _physics_process(delta: float) -> void:
 func set_powerup_type(powerup, duration):
 	hitbox.powerup = powerup
 	spawn_duration = duration
-	full_spawn_duration = spawn_duration
 	animated_sprite_2d.material.set_shader_parameter("hat_end_color", Globals.get_powerup_color(powerup))
 	if spawn_duration >= 0:
 		animated_sprite_2d.material.set_shader_parameter("alpha", 0.5)
 		hitbox.set_collision_mask_value(1,false)
 		hitbox.set_collision_mask_value(4,false)
 		hurtbox.set_collision_layer_value(5,false)
-		if spawn_duration <= 3.0:
-			timer_color = Color8(0,255,0,127)
-		elif spawn_duration <= 6.0:
-			timer_color = Color8(255,255,0,127)
-		else:
-			timer_color = Color8(255,0,0,127)
 
 func _draw() -> void:
 	if spawn_duration > 0.0: 
-		draw_arc(Vector2(0,1), 7, 0, 2*spawn_duration/full_spawn_duration*PI, 30, timer_color, 2)
+		draw_arc(Vector2(0,1), 7, 0, 2*spawn_duration/2.5*PI, 30, Color8(0,255,0,127), 2)
