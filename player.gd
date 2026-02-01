@@ -288,17 +288,17 @@ func _physics_process(delta: float) -> void:
 			if stomp_ray_left.is_colliding():
 				var left_hurt = stomp_ray_left.get_collider()
 				if left_hurt is Hurtbox:
-					jump()
+					jump(2*jump_amount)
 					left_hurt.take_hit(hitbox, true)
 			elif stomp_ray_right.is_colliding():
 				var right_hurt = stomp_ray_right.get_collider()
 				if right_hurt is Hurtbox:
-					jump()
+					jump(2*jump_amount)
 					right_hurt.take_hit(hitbox, true)
 			elif stomp_ray_middle.is_colliding():
 				var middle_hurt = stomp_ray_middle.get_collider()
 				if middle_hurt is Hurtbox:
-					jump()
+					jump(2*jump_amount)
 					middle_hurt.take_hit(hitbox, true)
 			
 			if !is_on_floor():
