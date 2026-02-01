@@ -8,7 +8,7 @@
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_xu7g1"]
 atlas = ExtResource("2_to7bl")
-region = Rect2(0, 0, 9, 6)
+region = Rect2(0, 0, 12, 8)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_6cuax"]
 animations = [{
@@ -32,6 +32,7 @@ script = ExtResource("1_to7bl")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 material = ExtResource("2_xu7g1")
+position = Vector2(0, -1)
 sprite_frames = SubResource("SpriteFrames_6cuax")
 autoplay = "default"
 
