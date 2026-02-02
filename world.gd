@@ -31,12 +31,12 @@ func _ready() -> void:
 	
 	get_tree().current_scene.add_child(player1)
 	player1.global_position = get_node(levelText+"/Player1Spawn").global_position
-	player1.clothing_color(Color8(8,135,206,255))
+	player1.clothing_color(Color8(8,105,176,255))
 	player1.player_id = 1
 	
 	get_tree().current_scene.add_child(player2)
 	player2.global_position = get_node(levelText+"/Player2Spawn").global_position
-	player2.clothing_color(Color8(194,11,11,255))
+	player2.clothing_color(Color8(164,11,11,255))
 	player2.player_id = 0
 	
 	var powerups = range(1,5)

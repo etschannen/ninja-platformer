@@ -9,12 +9,12 @@ const vec4 hat_start_color = vec4(50.0/255.0, 50.0/255.0, 50.0/255.0, 1.0);
 uniform float alpha = 1.0;
 
 void fragment() {
-	
+
 	vec4 texture_color = texture(TEXTURE, UV);
 	vec4 output_color = texture_color;
-	if (output_color == clothing_start_color) {
+	if (output_color.a == (200.0/255.0)) {
 		output_color = clothing_end_color;
-	} else if (output_color == hat_start_color) {
+	} else if (output_color.a == (201.0/255.0)) {
 		output_color = hat_end_color;
 	}
 	if (flash_enabled) {
