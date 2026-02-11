@@ -24,6 +24,8 @@ enum STATE { MOVE, CLIMB, HIT, DEAD }
 @export var player_id: = 0
 @export var player_color: = Color8(255,255,255,255)
 @export var hat_color: = Color8(0,0,0,255)
+@export var border_color: = Color8(0,255,0,255)
+@export var transparent_color: = Color8(0,0,0,0)
 @export var dash_amt_start: = 500
 @export var dash_amt_finish: = 180
 @export var dash_time: = 0.10
@@ -89,7 +91,9 @@ var dim_amount = 0.5
 
 func clothing_color(color):
 	player_color = color
-	sprite_upper.material.set_shader_parameter("clothing_end_color", player_color)
+	sprite_upper.material.set_shader_parameter("primary_color", player_color)
+	sprite_upper.material.set_shader_parameter("secondary_color", player_color.darkened(0.2))
+	sprite_upper.material.set_shader_parameter("border_color", transparent_color)
 	
 func update_hat_color(color):
 	if hat.visible:
@@ -97,7 +101,7 @@ func update_hat_color(color):
 	else:
 		hat.visible = true
 		hat_color = color
-	sprite_upper.material.set_shader_parameter("hat_end_color", hat_color)
+	sprite_upper.material.set_shader_parameter("hat_color", hat_color)
 
 func _ready() -> void:
 	var viewport_size = get_viewport_rect().size
@@ -291,9 +295,9 @@ func _physics_process(delta: float) -> void:
 					update_dash_velocity()
 					
 			if is_dashing || (attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time):
-				sprite_lower.material.set_shader_parameter("alpha", 0.5)
+				sprite_lower.material.set_shader_parameter("border_color", border_color)
 			else:
-				sprite_lower.material.set_shader_parameter("alpha", 1.0)
+				sprite_lower.material.set_shader_parameter("border_color", transparent_color)
 					
 			if stomp_ray_left.is_colliding():
 				var left_hurt = stomp_ray_left.get_collider()
@@ -381,7 +385,7 @@ func _physics_process(delta: float) -> void:
 			if should_wall_climb():
 				is_dashing = false
 				dash_particles.emitting = false
-				sprite_lower.material.set_shader_parameter("alpha", 1.0)
+				sprite_lower.material.set_shader_parameter("border_color", transparent_color)
 				animation_player_upper.play("hang")
 				state = STATE.CLIMB
 			

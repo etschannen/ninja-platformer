@@ -49,9 +49,9 @@ func _physics_process(delta: float) -> void:
 func set_powerup_type(powerup, duration):
 	hitbox.powerup = powerup
 	spawn_duration = duration
-	animated_sprite_2d.material.set_shader_parameter("hat_end_color", Globals.get_powerup_color(powerup))
+	animated_sprite_2d.material.set_shader_parameter("hat_color", Globals.get_powerup_color(powerup))
 	if spawn_duration >= 0:
-		animated_sprite_2d.material.set_shader_parameter("alpha", 0.5)
+		animated_sprite_2d.material.set_shader_parameter("alpha", 0.7)
 		hitbox.set_collision_mask_value(1,false)
 		hitbox.set_collision_mask_value(4,false)
 		hurtbox.set_collision_layer_value(5,false)
