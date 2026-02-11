@@ -5,6 +5,7 @@ const POWERUP_SCENE = preload("res://powerup.tscn")
 @onready var level1: = $Level1
 @onready var level2: = $Level2
 @onready var camera: = $Camera
+@onready var background: Sprite2D = $Background
 
 var player_is_dead = false
 
@@ -14,6 +15,7 @@ func _ready() -> void:
 	var levelNumber = rng.randi_range(1,10)
 	var levelText = "Level"+str(levelNumber)
 	camera.offset = get_node(levelText+"/Center").global_position
+	background.global_position = get_node(levelText+"/Center").global_position
 	
 	var player1_guid = Input.get_joy_guid(0)
 	var player2_guid = Input.get_joy_guid(1)

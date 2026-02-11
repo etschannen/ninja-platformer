@@ -53,6 +53,9 @@ var ghost_timer = 0.0
 var blood_timer = 0.0
 var current_stretch = 0
 var current_stretch_time = 0.0
+var dim_time = 0.0
+var dim_duration = 2.0
+var dim_amount = 0.5
 
 @onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
@@ -82,6 +85,7 @@ var current_stretch_time = 0.0
 @onready var health_2: Sprite2D = $Anchor/Health2
 @onready var health_3: Sprite2D = $Anchor/Health3
 @onready var hat: Sprite2D = $Anchor/Hat
+@onready var point_light: PointLight2D = $Anchor/PointLight2D
 
 func clothing_color(color):
 	player_color = color
@@ -228,6 +232,7 @@ func add_ghost():
 	ghost.animation_player_lower.pause()
 	ghost.player.scale = player.scale
 	ghost.anchor.scale = anchor.scale
+	ghost.point_light.visible = false
 	ghost.sprite_lower.material.set_shader_parameter("alpha", 0.5)
 	ghost.animate_health(0)
 
@@ -238,6 +243,11 @@ func _physics_process(delta: float) -> void:
 		if ghost_timer > 0.2:
 			queue_free()
 		return
+		
+	dim_time += delta
+	while dim_time > dim_duration:
+		dim_time -= dim_duration
+	point_light.energy = 0.8 - dim_amount*abs(dim_time-dim_duration/2)
 	
 	wrapping_screen()
 	

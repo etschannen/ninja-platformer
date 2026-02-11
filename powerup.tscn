@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://couyk3mxnfx3u"]
+[gd_scene load_steps=12 format=3 uid="uid://couyk3mxnfx3u"]
 
 [ext_resource type="Script" uid="uid://c6en00b84oto3" path="res://powerup.gd" id="1_to7bl"]
 [ext_resource type="Texture2D" uid="uid://kx71bccl7lm0" path="res://hat.png" id="2_to7bl"]
@@ -27,6 +27,17 @@ radius = 2.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_t2bd8"]
 radius = 3.0
 
+[sub_resource type="Gradient" id="Gradient_bwjto"]
+offsets = PackedFloat32Array(0, 0.6698895)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_xu7g1"]
+gradient = SubResource("Gradient_bwjto")
+width = 40
+height = 40
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
 [node name="Powerup" type="Node2D"]
 script = ExtResource("1_to7bl")
 
@@ -54,3 +65,6 @@ metadata/_custom_type_script = "uid://qjrnpv4tbvkp"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 shape = SubResource("CircleShape2D_t2bd8")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+texture = SubResource("GradientTexture2D_xu7g1")

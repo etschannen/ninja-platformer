@@ -4,8 +4,12 @@ extends Node2D
 @onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: Hitbox = $Hitbox
 @onready var hurtbox: Hurtbox = $Hurtbox
+@onready var point_light_2d: PointLight2D = $PointLight2D
 
 var spawn_duration = 0.0
+var dim_time = 0.0
+var dim_duration = 2.0
+var dim_amount = 0.5
 
 func _ready() -> void:
 	powerup.scale = Vector2(Globals.default_scale, Globals.default_scale)
@@ -20,6 +24,11 @@ func _ready() -> void:
 	)
 	
 func _physics_process(delta: float) -> void:
+	dim_time += delta
+	while dim_time > dim_duration:
+		dim_time -= dim_duration
+	point_light_2d.energy = 0.8 - dim_amount*abs(dim_time-dim_duration/2)
+	
 	if spawn_duration > 2.5:
 		powerup.visible = false
 		spawn_duration -= delta
