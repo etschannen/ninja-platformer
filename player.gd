@@ -57,7 +57,8 @@ var current_stretch = 0
 var current_stretch_time = 0.0
 var dim_time = 0.0
 var dim_duration = 2.0
-var dim_amount = 0.5
+var dim_max = 3.0
+var dim_min = 2.0
 
 @onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
@@ -251,7 +252,7 @@ func _physics_process(delta: float) -> void:
 	dim_time += delta
 	while dim_time > dim_duration:
 		dim_time -= dim_duration
-	point_light.energy = 0.8 - dim_amount*abs(dim_time-dim_duration/2)
+	point_light.energy = dim_max - (dim_max-dim_min)*abs(dim_time-dim_duration/2)
 	
 	wrapping_screen()
 	

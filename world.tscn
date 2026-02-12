@@ -1,7 +1,7 @@
 [gd_scene load_steps=33 format=4 uid="uid://b6jqdqmnr2cqf"]
 
 [ext_resource type="Script" uid="uid://dephygc4nk1vv" path="res://world.gd" id="1_aqk2v"]
-[ext_resource type="Texture2D" uid="uid://cwse1ej5rlo5o" path="res://High Forest/Background/Background.png" id="2_fj7yv"]
+[ext_resource type="Texture2D" uid="uid://cemburw2xild7" path="res://Legacy/Legacy Fantasy - Sewer Canals/Background/Background.png" id="2_fj7yv"]
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_f3sb7"]
 polygon = PackedVector2Array(-7, -7, 8, -7, 8, 8, -7, 8)
