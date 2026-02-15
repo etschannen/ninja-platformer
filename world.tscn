@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=4 uid="uid://b6jqdqmnr2cqf"]
+[gd_scene load_steps=36 format=4 uid="uid://b6jqdqmnr2cqf"]
 
 [ext_resource type="Script" uid="uid://dephygc4nk1vv" path="res://world.gd" id="1_aqk2v"]
 [ext_resource type="Texture2D" uid="uid://cemburw2xild7" path="res://Legacy/Legacy Fantasy - Sewer Canals/Background/Background.png" id="2_fj7yv"]
@@ -180,6 +180,23 @@ tonemap_mode = 1
 glow_enabled = true
 glow_intensity = 1.14
 glow_bloom = 0.2
+
+[sub_resource type="Gradient" id="Gradient_fj7yv"]
+offsets = PackedFloat32Array(0, 0.34591195, 0.6713836, 1)
+colors = PackedColorArray(0, 0, 0, 0, 0.20392157, 0.41960785, 0.20784314, 1, 0.20392157, 0.41960785, 0.20784314, 1, 0.20392157, 0.41960785, 0.20784314, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_tlwt5"]
+gradient = SubResource("Gradient_fj7yv")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_fj7yv"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(350, 200, 1)
+spread = 20.0
+gravity = Vector3(0, 40, 0)
+scale_max = 2.3999999
+color = Color(0.2058, 0.42, 0.20936999, 0.78431374)
+color_ramp = SubResource("GradientTexture1D_tlwt5")
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_aqk2v")
@@ -488,9 +505,16 @@ position = Vector2(-125, -60)
 environment = SubResource("Environment_4h6ng")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.8317712, 1.5720325, 0.8441089, 1)
 
 [node name="Background" type="Sprite2D" parent="."]
 z_index = -1
 z_as_relative = false
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("2_fj7yv")
+
+[node name="ForegroundParticles" type="GPUParticles2D" parent="."]
+amount = 20
+lifetime = 2.0
+visibility_rect = Rect2(-350, -200, 700, 400)
+process_material = SubResource("ParticleProcessMaterial_fj7yv")
