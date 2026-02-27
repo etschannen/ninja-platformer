@@ -33,7 +33,6 @@ enum STATE { MOVE, CLIMB, HIT, DEAD }
 @export var dash_cooldown: = 0.5
 @export var attack_rebound_time: = 0.4
 @export var attack_cooldown: = 0.6
-@export var attack_charges: = 0
 @export var max_stretch = 0.2
 @export var stretch_full_duration = 0.25
 @export var stretch_duration = 0.2
@@ -48,7 +47,6 @@ var air_adjust = 0
 var screen_size = Rect2(0,0,1,1)
 var attack_hold_timer = 0.0
 var attack_cooldown_timer = 0.0
-var attack_charge = 0
 var jump_hold_timer = 0.0
 var is_ghost = false
 var ghost_timer = 0.0
@@ -135,7 +133,7 @@ func _ready() -> void:
 				dash_time += 0.1
 				return
 			Globals.PowerupType.ATTACK:
-				attack_charges += 1
+				attack_cooldown -= 0.15
 				return
 			Globals.PowerupType.BLOCK:
 				attack_rebound_time += 0.4
@@ -152,7 +150,7 @@ func _ready() -> void:
 		
 		var dir = other_hitbox.global_position.direction_to(hitbox.global_position)
 		if !stomp:
-			if is_dashing || (attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time):
+			if is_dashing || (attack_hold_timer > 0.0 && attack_hold_timer <= attack_rebound_time):
 				var spark_particle = SPARK_PARTICLE_BURST_EFFECT.instantiate()
 				add_child(spark_particle)
 				spark_particle.global_position = sprite_upper.global_position
@@ -275,12 +273,7 @@ func _physics_process(delta: float) -> void:
 			attack_cooldown_timer -= delta
 			coyote_time -= delta
 				
-			if (attack_cooldown_timer < 0 || attack_charge < attack_charges) && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X)):
-				if attack_hold_timer <= 0:
-					if attack_cooldown_timer >= 0:
-						attack_charge += 1
-					else:
-						attack_charge = 0
+			if !is_dashing && attack_cooldown_timer < 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X)):
 				attack_hold_timer += delta
 			
 			if is_dashing:
@@ -333,7 +326,7 @@ func _physics_process(delta: float) -> void:
 			if !Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) || jump_hold_timer >= jump_charge:
 				jump_hold_timer = 0
 			
-			if !Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) && !Input.is_joy_button_pressed(device_id, JOY_BUTTON_X) && attack_hold_timer > 0:
+			if !is_dashing && !Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) && !Input.is_joy_button_pressed(device_id, JOY_BUTTON_X) && attack_hold_timer > 0:
 				slash_sound.play()
 				attack_hold_timer = 0.0
 				attack_cooldown_timer = attack_cooldown
