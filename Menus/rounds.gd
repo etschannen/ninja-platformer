@@ -19,7 +19,7 @@ func _process(delta: float) -> void:
 			Globals.roundData.red_score = 0
 			get_tree().change_scene_to_file("res://Menus/menu.tscn")
 		else:
-			get_tree().change_scene_to_file("res://world.tscn")
+			get_tree().change_scene_to_file("res://tag_world.tscn")
 
 func _unhandled_input(event):
 	if event is InputEventKey && event.keycode == KEY_ESCAPE:
