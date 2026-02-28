@@ -15,7 +15,9 @@
 [ext_resource type="AudioStream" uid="uid://crq5olvkleox0" path="res://Slash.wav" id="13_0dnqy"]
 
 [sub_resource type="Resource" id="Resource_fh811"]
+resource_local_to_scene = true
 script = ExtResource("2_c0kop")
+health = 3
 metadata/_custom_type_script = "uid://2i8vukneqwu1"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2hs0m"]

@@ -10,6 +10,8 @@ enum PowerupType {
 	JUMP
 }
 
+var default_game_scene = "res://tag_world.tscn"
+
 func _ready():
 	await get_tree().create_timer(3.0).timeout
 	song_1.play()

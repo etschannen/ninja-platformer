@@ -13,7 +13,7 @@ var player_is_dead = false
 func _ready() -> void:
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
-	var levelNumber = rng.randi_range(1,10)
+	var levelNumber = 1
 	var levelText = "Level"+str(levelNumber)
 	camera.offset = get_node(levelText+"/Center").global_position
 	background.global_position = get_node(levelText+"/Center").global_position
@@ -42,21 +42,6 @@ func _ready() -> void:
 	player2.global_position = get_node(levelText+"/Player2Spawn").global_position
 	player2.clothing_color(Color8(164,11,11,255))
 	player2.player_id = 0
-	
-	var powerups = range(1,5)
-	var durations = [3.5, 5.5, 7.5, 9.5]
-	for num in range(0,rng.randi() % 5):
-		powerups.remove_at(rng.randi() % powerups.size())
-	
-	for pow in powerups:
-		var powerupType = Globals.PowerupType.NONE
-		while powerupType == Globals.PowerupType.NONE:
-			powerupType = Globals.PowerupType.values().pick_random()
-
-		var powerup = POWERUP_SCENE.instantiate()
-		get_tree().current_scene.add_child(powerup)
-		powerup.global_position = get_node(levelText+"/ItemSpawn"+str(pow)).global_position
-		powerup.set_powerup_type(powerupType, durations.pick_random())
 	
 func _unhandled_input(event):
 	if event is InputEventKey && event.keycode == KEY_ESCAPE:
