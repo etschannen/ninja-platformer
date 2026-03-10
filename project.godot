@@ -13,6 +13,7 @@ config_version=5
 config/name="Ninja Platformer"
 run/main_scene="uid://deph2jcoa707o"
 config/features=PackedStringArray("4.5", "Forward Plus")
+run/max_fps=240
 config/icon="res://icon.svg"
 
 [autoload]
@@ -28,6 +29,10 @@ window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="canvas_items"
 window/vsync/vsync_mode=0
+
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=true
 
 [input]
 

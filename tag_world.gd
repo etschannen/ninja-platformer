@@ -3,7 +3,6 @@ extends Node2D
 const PLAYER_SCENE = preload("res://tag_player.tscn")
 const POWERUP_SCENE = preload("res://powerup.tscn")
 @onready var level1: = $Level1
-@onready var level2: = $Level2
 @onready var camera: = $Camera
 @onready var background: Sprite2D = $Background
 @onready var foreground_particles: GPUParticles2D = $ForegroundParticles
@@ -23,25 +22,45 @@ func _ready() -> void:
 	var player2_guid = Input.get_joy_guid(1)
 	
 	RenderingServer.set_default_clear_color("#272736")
-	var player1 = PLAYER_SCENE.instantiate()
-	var player2 = PLAYER_SCENE.instantiate()
+	var player1A = PLAYER_SCENE.instantiate()
+	var player1B = PLAYER_SCENE.instantiate()
+	var player2A = PLAYER_SCENE.instantiate()
+	var player2B = PLAYER_SCENE.instantiate()
 	
 	if player1_guid < player2_guid:
-		player1.device_id = 0
-		player2.device_id = 1
+		player1A.device_id = 0
+		player1B.device_id = 0
+		player2A.device_id = 1
+		player2B.device_id = 1
 	else:
-		player1.device_id = 1
-		player2.device_id = 0
+		player1A.device_id = 1
+		player1B.device_id = 1
+		player2A.device_id = 0
+		player2B.device_id = 0
 	
-	get_tree().current_scene.add_child(player1)
-	player1.global_position = get_node(levelText+"/Player1Spawn").global_position
-	player1.clothing_color(Color8(8,105,176,255))
-	player1.player_id = 1
+	get_tree().current_scene.add_child(player1A)
+	player1A.global_position = get_node(levelText+"/Player1ASpawn").global_position
+	player1A.clothing_color(Color8(8,105,176,255))
+	player1A.player_id = 1
+	player1A.character_id = 0
 	
-	get_tree().current_scene.add_child(player2)
-	player2.global_position = get_node(levelText+"/Player2Spawn").global_position
-	player2.clothing_color(Color8(164,11,11,255))
-	player2.player_id = 0
+	get_tree().current_scene.add_child(player1B)
+	player1B.global_position = get_node(levelText+"/Player1BSpawn").global_position
+	player1B.clothing_color(Color8(8,105,176,255))
+	player1B.player_id = 1
+	player1B.character_id = 1
+	
+	get_tree().current_scene.add_child(player2A)
+	player2A.global_position = get_node(levelText+"/Player2ASpawn").global_position
+	player2A.clothing_color(Color8(164,11,11,255))
+	player2A.player_id = 0
+	player2A.character_id = 0
+	
+	get_tree().current_scene.add_child(player2B)
+	player2B.global_position = get_node(levelText+"/Player2BSpawn").global_position
+	player2B.clothing_color(Color8(164,11,11,255))
+	player2B.player_id = 0
+	player2B.character_id = 1
 	
 func _unhandled_input(event):
 	if event is InputEventKey && event.keycode == KEY_ESCAPE:

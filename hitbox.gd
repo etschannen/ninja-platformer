@@ -20,10 +20,24 @@ func process_hit(area_2d: Area2D) -> void:
 func recheck():
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsShapeQueryParameters2D.new()
-	query.shape = $CollisionShape2D.shape
+	var shape = ConvexPolygonShape2D.new()
+	shape.points = $CollisionPolygon2D.polygon
+	query.shape = shape
 	query.transform = global_transform
 	query.collision_mask = collision_mask
 	query.collide_with_areas = true
 
 	for obj in space_state.intersect_shape(query):
 		process_hit(obj["collider"])
+		
+func collison_number():
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsShapeQueryParameters2D.new()
+	var shape = ConvexPolygonShape2D.new()
+	shape.points = $CollisionPolygon2D.polygon
+	query.shape = shape
+	query.transform = global_transform
+	query.collision_mask = collision_mask
+	query.collide_with_areas = true
+	
+	return space_state.intersect_shape(query).size()

@@ -3,25 +3,17 @@ extends CharacterBody2D
 const PLAYER_SCENE = preload("res://tag_player.tscn")
 const SPARK_PARTICLE_BURST_EFFECT = preload("res://sparks_particle_burst_effect.tscn")
 
-enum STATE { MOVE, CLIMB, HIT, DEAD }
+enum STATE { CLIMB, HIT, DEAD }
 
 @export var stats: PlayerStats
 @export var state: = STATE.CLIMB
 
 @export var max_speed: = 180
 @export var acceleration: = 10000
-@export var air_acceleration: = 2000
 @export var friction: = 10000
-@export var air_friction: = 10000
-@export var up_gravity: = 1000
-@export var down_gravity: = 1200
-@export var max_gravity: = 400
-@export var jump_amount: = 200
-@export var jump_charge: = 0.2
-@export var air_jump: = false
-@export var air_adjust_amount: = 75
 @export var device_id: = 0
 @export var player_id: = 0
+@export var character_id: = 0
 @export var player_color: = Color8(255,255,255,255)
 @export var hat_color: = Color8(0,0,0,255)
 @export var border_color: = Color8(0,255,0,255)
@@ -36,18 +28,18 @@ enum STATE { MOVE, CLIMB, HIT, DEAD }
 @export var max_stretch = 0.2
 @export var stretch_full_duration = 0.25
 @export var stretch_duration = 0.2
+@export var max_stamina = 0.75
+@export var stamina_idle_time = 1.5
+@export var stamina_recharge_ratio = 0.2
 
 var is_dashing: = false
 var dash_timer: = 0.0
 var dash_cooldown_timer: = 0.0
-var coyote_time: = 0.0
 var dash_velocity = Vector2(0,0)
 var velocity_before_dash = Vector2(0,0)
-var air_adjust = 0
 var screen_size = Rect2(0,0,1,1)
 var attack_hold_timer = 0.0
 var attack_cooldown_timer = 0.0
-var jump_hold_timer = 0.0
 var is_ghost = false
 var ghost_timer = 0.0
 var blood_timer = 0.0
@@ -57,6 +49,9 @@ var dim_time = 0.0
 var dim_duration = 2.0
 var dim_max = 3.0
 var dim_min = 2.0
+var current_stamina = max_stamina
+var stamina_idle_duration = stamina_idle_time
+var using_stamina = false
 
 @onready var player: CharacterBody2D = $"."
 @onready var anchor: Node2D = $Anchor
@@ -65,15 +60,10 @@ var dim_min = 2.0
 @onready var animation_player_upper: AnimationPlayer = $AnimationPlayerUpper
 @onready var animation_player_lower: AnimationPlayer = $AnimationPlayerLower
 @onready var effects_animation_player: AnimationPlayer = $EffectsAnimationPlayer
-@onready var ray_cast_upper: RayCast2D = $Anchor/RayCastUpper
-@onready var ray_cast_lower: RayCast2D = $Anchor/RayCastLower
 @onready var hurtbox: Hurtbox = $Anchor/Hurtbox
 @onready var hitbox: Hitbox = $Anchor/Hitbox
 @onready var shaker_upper: = Shaker.new(sprite_upper)
 @onready var shaker_lower: = Shaker.new(sprite_lower)
-@onready var stomp_ray_left: RayCast2D = $Anchor/StompRayLeft
-@onready var stomp_ray_right: RayCast2D = $Anchor/StompRayRight
-@onready var stomp_ray_middle: RayCast2D = $Anchor/StompRayMiddle
 @onready var jump_sound: AudioStreamPlayer = $JumpSound
 @onready var dash_sound: AudioStreamPlayer = $DashSound
 @onready var hit_hurt_sound: AudioStreamPlayer = $HitHurtSound
@@ -82,9 +72,6 @@ var dim_min = 2.0
 @onready var dash_particles_material: ParticleProcessMaterial = $DashParticles.process_material
 @onready var blood_particles: GPUParticles2D = $BloodParticles
 @onready var blood_particles_material: ParticleProcessMaterial = $BloodParticles.process_material
-@onready var health_1: Sprite2D = $Anchor/Health1
-@onready var health_2: Sprite2D = $Anchor/Health2
-@onready var health_3: Sprite2D = $Anchor/Health3
 @onready var hat: Sprite2D = $Anchor/Hat
 @onready var point_light: PointLight2D = $Anchor/PointLight2D
 
@@ -124,7 +111,7 @@ func _ready() -> void:
 	if is_ghost:
 		remove_collision()
 	
-	hurtbox.hurt.connect(func(other_hitbox: Hitbox, stomp):
+	hurtbox.hurt.connect(func(other_hitbox: Hitbox, _stomp):
 		if other_hitbox.powerup != Globals.PowerupType.NONE:
 			update_hat_color(Globals.get_powerup_color(other_hitbox.powerup))
 		
@@ -141,34 +128,8 @@ func _ready() -> void:
 			Globals.PowerupType.MOVEMENT:
 				max_speed += 100
 				return
-			Globals.PowerupType.JUMP:
-				air_jump = true
-				return
 		
-		if stats.health <= 0:
-			return
-		
-		var dir = other_hitbox.global_position.direction_to(hitbox.global_position)
-		if !stomp:
-			if is_dashing || (attack_hold_timer > 0.0 && attack_hold_timer <= attack_rebound_time):
-				var spark_particle = SPARK_PARTICLE_BURST_EFFECT.instantiate()
-				add_child(spark_particle)
-				spark_particle.global_position = sprite_upper.global_position
-				spark_particle.set_dir(dir)
-				return
-				
-			blood_particles.emitting = true
-			blood_particles_material.direction.x = dir.x
-			blood_particles_material.direction.y = dir.y
-			blood_timer = 0.1
-		
-		hit_hurt_sound.play()
-		
-		@warning_ignore("narrowing_conversion")
-		stats.health -= other_hitbox.damage
-		animate_health(stats.health)
-		
-		if stats.health <= 0:
+		if hitbox.collison_number() > 2:
 			remove_collision()
 			
 			state = STATE.DEAD
@@ -178,25 +139,7 @@ func _ready() -> void:
 			else:
 				Globals.roundData.red_score += 1
 			get_tree().current_scene.player_killed()
-		else:
-			var x_direction = sign(dir.x)
-			if x_direction == 0: x_direction = -1
-				 
-			velocity.x = x_direction * dash_amt_finish
-			@warning_ignore("integer_division")
-			jump(jump_amount/2)
-			
-			state = STATE.HIT
-			shaker_upper.shake(3, 0.3)
-			shaker_lower.shake(3, 0.3)
-			animation_player_lower.play("jump")
-			effects_animation_player.play("hitflash")
 	)
-	
-func animate_health(new_health):
-	health_1.visible = new_health >= 1
-	health_2.visible = new_health >= 2
-	health_3.visible = new_health >= 3
 
 func update_dash_velocity():
 	if dash_timer < dash_stop_time:
@@ -254,8 +197,18 @@ func _physics_process(delta: float) -> void:
 	
 	wrapping_screen()
 	
-	var y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
-	var x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
+	var x_input
+	var y_input
+	var use_stamina
+	if character_id == 0:
+		x_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_X)
+		y_input = Input.get_joy_axis(device_id, JOY_AXIS_LEFT_Y)
+		use_stamina = Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_LEFT) >= 0.5
+	else:
+		x_input = Input.get_joy_axis(device_id, JOY_AXIS_RIGHT_X)
+		y_input = Input.get_joy_axis(device_id, JOY_AXIS_RIGHT_Y)
+		use_stamina = Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) >= 0.5
+	
 	if abs(x_input) < 0.2:
 		x_input = 0
 	if abs(y_input) < 0.2:
@@ -265,181 +218,53 @@ func _physics_process(delta: float) -> void:
 		blood_timer -= delta
 		if blood_timer < 0:
 			blood_particles.emitting = false
+			
+	if !is_dashing:
+		if x_input == 0 && y_input == 0:
+			apply_friction(delta)
+			animation_player_lower.play("stand")
+		else:
+			#accelerate_horizontally(x_input, delta)
+			if x_input != 0:
+				anchor.scale.x = sign(x_input)
+			animation_player_lower.play("run")
+	
+	if using_stamina:
+		current_stamina -= delta
+		queue_redraw()
+	else:
+		if stamina_idle_duration >= stamina_idle_time:
+			if current_stamina < max_stamina:
+				current_stamina += delta*stamina_recharge_ratio
+				if current_stamina > max_stamina:
+					current_stamina = max_stamina
+				queue_redraw()
+		else:
+			stamina_idle_duration += delta
 		
+	var use_speed = max_speed
+	using_stamina = false
+	if use_stamina && current_stamina > 0.0:
+		using_stamina = true
+		stamina_idle_duration = 0.0
+		use_speed = 2 * max_speed
+			
 	match state:
-		STATE.MOVE:
-			dash_timer -= delta
-			dash_cooldown_timer -= delta
-			attack_cooldown_timer -= delta
-			coyote_time -= delta
-				
-			if !is_dashing && attack_cooldown_timer < 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) || Input.is_joy_button_pressed(device_id, JOY_BUTTON_X)):
-				attack_hold_timer += delta
-			
-			if is_dashing:
-				ghost_timer += delta
-				if ghost_timer > 0.05:
-					ghost_timer = 0.0
-					add_ghost()
-				if dash_timer <= 0:
-					is_dashing = false
-					dash_particles.emitting = false
-					velocity = velocity_before_dash
-				else:
-					update_dash_velocity()
-					
-			if is_dashing || (attack_hold_timer > 0 && attack_hold_timer <= attack_rebound_time):
-				sprite_lower.material.set_shader_parameter("border_color", border_color)
-			else:
-				sprite_lower.material.set_shader_parameter("border_color", transparent_color)
-					
-			if stomp_ray_left.is_colliding():
-				var left_hurt = stomp_ray_left.get_collider()
-				if left_hurt is Hurtbox:
-					jump(2*jump_amount)
-					left_hurt.take_hit(hitbox, true)
-			elif stomp_ray_right.is_colliding():
-				var right_hurt = stomp_ray_right.get_collider()
-				if right_hurt is Hurtbox:
-					jump(2*jump_amount)
-					right_hurt.take_hit(hitbox, true)
-			elif stomp_ray_middle.is_colliding():
-				var middle_hurt = stomp_ray_middle.get_collider()
-				if middle_hurt is Hurtbox:
-					jump(2*jump_amount)
-					middle_hurt.take_hit(hitbox, true)
-			
-			if !is_on_floor():
-				velocity.y -= air_adjust
-				
-			apply_gravity(delta)
-			
-			if Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) && (jump_hold_timer > 0 || (is_on_floor() or coyote_time > 0 or air_jump)):
-				if is_on_floor() or coyote_time > 0:
-					current_stretch = max_stretch
-					current_stretch_time = stretch_full_duration
-				if jump_hold_timer == 0:
-					jump_sound.play()
-				jump_hold_timer += delta
-				jump()
-				
-			if !Input.is_joy_button_pressed(device_id, JOY_BUTTON_A) || jump_hold_timer >= jump_charge:
-				jump_hold_timer = 0
-			
-			if !is_dashing && !Input.is_joy_button_pressed(device_id, JOY_BUTTON_B) && !Input.is_joy_button_pressed(device_id, JOY_BUTTON_X) && attack_hold_timer > 0:
-				slash_sound.play()
-				attack_hold_timer = 0.0
-				attack_cooldown_timer = attack_cooldown
-				var input_vec = Vector2(x_input, y_input)
-				if input_vec == Vector2.ZERO:
-					animation_player_upper.play("attack_right")
-				else:
-					var angle = fmod(input_vec.angle() + PI*2, PI*2)
-					var sector = int(round(angle / (PI/4.0))) % 8
-					if sector == 5 || sector == 7:
-						animation_player_upper.play("attack_up_right")
-					elif sector == 6:
-						animation_player_upper.play("attack_up")
-					elif (sector == 1 || sector == 3):
-						animation_player_upper.play("attack_down_right")
-					elif sector == 2:
-						animation_player_upper.play("attack_down")
-					else:
-						animation_player_upper.play("attack_right")
-			
-			if !is_dashing:
-				if x_input == 0:
-					apply_friction(delta)
-					animation_player_lower.play("stand")
-				else:
-					accelerate_horizontally(x_input, delta)
-					anchor.scale.x = sign(x_input)
-					animation_player_lower.play("run")
-				
-				if not is_on_floor():
-					animation_player_lower.play("jump")
-			
-			if dash_cooldown_timer <= 0 && (Input.is_joy_button_pressed(device_id, JOY_BUTTON_LEFT_STICK) || Input.get_joy_axis(device_id, JOY_AXIS_TRIGGER_RIGHT) >= 0.5):
-				dash(x_input, y_input)
-			
-			var was_on_floor: = is_on_floor()
-			var prev_velocity = velocity.y
-			if !is_on_floor():
-				air_adjust = y_input*air_adjust_amount
-				velocity.y += air_adjust
-			move_and_slide()
-			if is_on_floor():
-				air_adjust = 0
-			if was_on_floor and not is_on_floor() and velocity.y >= 0:
-				coyote_time = 0.1
-			if not was_on_floor and is_on_floor() and prev_velocity >= -1*max_speed:
-				current_stretch = -1*max_stretch
-				current_stretch_time = stretch_full_duration
-			
-			if should_wall_climb():
-				is_dashing = false
-				dash_particles.emitting = false
-				sprite_lower.material.set_shader_parameter("border_color", transparent_color)
-				animation_player_upper.play("hang")
-				state = STATE.CLIMB
-			
 		STATE.CLIMB:
-			var wall_normal = get_wall_normal()
-			
-			velocity.y = y_input * max_speed * 0.8
-			
+			velocity.x = x_input * use_speed * 0.8
+			velocity.y = y_input * use_speed * 0.8
 			move_and_slide()
-			
-			if y_input != 0:
-				animation_player_lower.play("climb")
-			else:
-				animation_player_lower.play("hang")
-			
-			var request_detach: bool = (sign(x_input) == wall_normal.x)
-			
-			var request_wall_jump: bool = (
-				(request_detach or Input.is_joy_button_pressed(device_id, JOY_BUTTON_B))
-				and not y_input > 0
-			)
-			
-			if request_wall_jump:
-				velocity.x = wall_normal.x * max_speed
-				anchor.scale.x = sign(velocity.x)
-				jump()
-				state = STATE.MOVE
-			
-			if not should_wall_climb() or request_detach:
-				if y_input < 0: jump()
-				state = STATE.MOVE
-		
 		STATE.HIT:
 			move_and_slide()
 		STATE.DEAD:
 			is_dashing = false
-			apply_gravity(delta)
-			apply_friction(delta)
 			animation_player_lower.play("stand")
+			apply_friction(delta)
 			move_and_slide()
-
-	var stretch_amount = 0
-	current_stretch_time -= delta
-	if current_stretch_time > 0:
-		if current_stretch_time > stretch_duration:
-			stretch_amount = current_stretch*(1.0-((current_stretch_time-stretch_duration)/(stretch_full_duration-stretch_duration)))
-		else:
-			stretch_amount = current_stretch*current_stretch_time/stretch_duration
-	
-	player.scale = Vector2(Globals.default_scale-stretch_amount, Globals.default_scale+stretch_amount)
-	health_1.scale = Vector2(Globals.default_scale/(Globals.default_scale-stretch_amount), Globals.default_scale/(Globals.default_scale+stretch_amount))
-	health_2.scale = health_1.scale
-	health_3.scale = health_1.scale
 
 func wrapping_screen():
 	position.x = wrapf(position.x, screen_size.position.x, screen_size.position.x + screen_size.size.x)
 	position.y = wrapf(position.y, screen_size.position.y, screen_size.position.y + screen_size.size.y)
-
-func jump(amount: = jump_amount) -> void:
-	velocity.y = -amount
 
 func dash(x_input, y_input) -> void:
 	dash_sound.play()
@@ -466,29 +291,20 @@ func accelerate_horizontally(horizontal_direction: float, delta: float) -> void:
 	if is_dashing:
 		return
 	var acceleration_amount: = acceleration
-	if not is_on_floor(): acceleration_amount = air_acceleration
 	velocity.x = move_toward(velocity.x, max_speed * horizontal_direction, acceleration_amount * delta * abs(horizontal_direction))
 
 func apply_friction(delta) -> void:
 	if is_dashing:
 		return
 	var friction_amount: = friction
-	if not is_on_floor(): friction_amount = air_friction
 	velocity.x = move_toward(velocity.x, 0.0, friction_amount * delta)
-
-func apply_gravity(delta) -> void:
-	if is_dashing:
-		return
-	if not is_on_floor():
-		if velocity.y <= 0:
-			velocity.y += up_gravity * delta
-		else:
-			velocity.y += down_gravity * delta
-		velocity.y = min(max_gravity, velocity.y)
-
-func should_wall_climb() -> bool:
-	return (
-		ray_cast_upper.is_colliding()
-		and ray_cast_lower.is_colliding()
-		and not is_on_floor()
-	)
+	
+func _draw() -> void:
+	if current_stamina >= 0.0:
+		var c = Color8(0,255,0,127)
+		if current_stamina < max_stamina:
+			c = Color8(230,189,43,127)
+			if stamina_idle_duration < stamina_idle_time:
+				c = Color8(255,0,0,127)
+		var l = 16*current_stamina/max_stamina
+		draw_rect(Rect2(-0.5*l,-36,l,1),c)
